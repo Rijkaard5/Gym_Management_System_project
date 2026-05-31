@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Dashboard - GymPro</title>
+    <style>
+        :root {
+            --skin: #fdbcb4;
+            --skin-dark: #e8a090;
+            --hair: #2c1810;
+            --shirt: #ff4757;
+            --shorts: #2ed573;
+            --shoe: #2f3542;
+            --bg: #0a0a1a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            background: #f0f2f5; 
+            min-height: 100vh; 
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #4CAF50, #2e7d32);
+            color: white; padding: 12px 25px;
+            display: flex; justify-content: space-between;
+            align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .navbar h1 { font-size: 1.3rem; }
+        .avatar-circle {
+            width: 40px; height: 40px; background: white; color: #4CAF50;
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-weight: bold; font-size: 1.2rem;
+        }
+        .btn-logout { 
+            padding: 8px 16px; background: rgba(255,255,255,0.2); 
+            color: white; border: 1px solid rgba(255,255,255,0.3); 
+            border-radius: 6px; cursor: pointer; 
+        }
+        
+        .container { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
+        
+        .welcome-card {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white; padding: 20px 25px; border-radius: 12px; margin-bottom: 20px;
+        }
+        
+        .tabs { display: flex; background: white; border-radius: 12px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .tab { flex: 1; padding: 14px; text-align: center; cursor: pointer; font-weight: 600; color: #888; border-bottom: 3px solid transparent; transition: all 0.3s; }
+        .tab:hover { color: #4CAF50; }
+        .tab.active { color: #4CAF50; border-bottom-color: #4CAF50; background: #f1f8e9; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .stat-box { background: white; padding: 18px; border-radius: 10px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+        .stat-box .num { font-size: 1.6rem; font-weight: bold; color: #4CAF50; }
+        .stat-box .lbl { font-size: 0.75rem; color: #888; margin-top: 4px; }
+        .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 15px; }
+
+        /* ============================================ */
+        /* 3D VIRTUAL TRAINER STUDIO */
+        /* ============================================ */
+        .studio-container {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 20px;
+        }
+        
+        .trainer-stage {
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            border-radius: 20px;
+            padding: 0;
+            position: relative;
+            min-height: 550px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+        
+        .stage-floor {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 30%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.1));
+            border-radius: 50% 50% 0 0 / 20px 20px 0 0;
+        }
+        
+        .stage-lights {
+            position: absolute;
+            top: 20px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 30px;
+        }
+        
+        .stage-light {
+            width: 80px; height: 60px;
+            background: radial-gradient(ellipse at center, rgba(255,215,0,0.6), transparent);
+            border-radius: 50%;
+            animation: glow 2s ease-in-out infinite;
+        }
+        
+        .stage-light:nth-child(2) { animation-delay: 0.5s; }
+        .stage-light:nth-child(3) { animation-delay: 1s; }
+        
+        @keyframes glow {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.2); }
+        }
+        
+        .mirror-wall {
+            position: absolute;
+            top: 10%; left: 5%; right: 5%; bottom: 35%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+        
+        /* 3D TRAINER FIGURE */
+        .trainer-3d {
+            position: relative;
+            width: 200px;
+            height: 320px;
+            margin-bottom: 30px;
+            transform-style: preserve-3d;
+            perspective: 800px;
+            z-index: 10;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Head */
+        .head-3d {
+            width: 55px; height: 60px;
+            background: linear-gradient(180deg, var(--skin) 60%, var(--skin-dark) 100%);
+            border-radius: 50% 50% 45% 45%;
+            margin: 0 auto 2px;
+            position: relative;
+            box-shadow: 
+                inset -5px -5px 10px rgba(0,0,0,0.15),
+                inset 5px 5px 10px rgba(255,255,255,0.1),
+                0 5px 15px rgba(0,0,0,0.3);
+            transition: all 0.4s;
+        }
+        
+        .hair-3d {
+            position: absolute;
+            top: -15px; left: -5px; right: -5px;
+            height: 35px;
+            background: linear-gradient(180deg, var(--hair), #3d2314);
+            border-radius: 50% 50% 0 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        
+        .hair-3d::after {
+            content: '';
+            position: absolute;
+            bottom: -5px; left: 50%; transform: translateX(-50%);
+            width: 30px; height: 15px;
+            background: var(--hair);
+            border-radius: 0 0 50% 50%;
+        }
+        
+        .face-details {
+            position: absolute;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 35px;
+        }
+        
+        .eyes-3d {
+            display: flex; justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .eye-3d {
+            width: 10px; height: 11px;
+            background: white;
+            border-radius: 50%;
+            position: relative;
+            box-shadow: inset 0 2px 3px rgba(0,0,0,0.2);
+        }
+        
+        .eye-3d::after {
+            content: '';
+            position: absolute;
+            width: 5px; height: 5px;
+            background: #1a1a2e;
+            border-radius: 50%;
+            top: 3px; left: 50%; transform: translateX(-50%);
+        }
+        
+        .eye-3d::before {
+            content: '';
+            position: absolute;
+            width: 2px; height: 2px;
+            background: white;
+            border-radius: 50%;
+            top: 2px; left: 6px;
+            z-index: 2;
+        }
+        
+        .eyebrow {
+            width: 12px; height: 3px;
+            background: var(--hair);
+            border-radius: 3px;
+            position: absolute;
+            top: -5px; left: -1px;
+        }
+        
+        .nose-3d {
+            width: 4px; height: 6px;
+            background: var(--skin-dark);
+            border-radius: 0 0 50% 50%;
+            margin: 0 auto 4px;
+        }
+        
+        .mouth-3d {
+            width: 14px; height: 6px;
+            background: #e74c3c;
+            border-radius: 0 0 14px 14px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .mouth-3d::after {
+            content: '';
+            position: absolute;
+            width: 10px; height: 3px;
+            background: white;
+            border-radius: 0 0 5px 5px;
+            bottom: 0; left: 2px;
+        }
+        
+        /* Neck */
+        .neck-3d {
+            width: 20px; height: 18px;
+            background: linear-gradient(180deg, var(--skin), var(--skin-dark));
+            margin: 0 auto;
+            border-radius: 5px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        /* Torso */
+        .torso-3d {
+            width: 75px; height: 85px;
+            background: linear-gradient(180deg, var(--shirt), #e0303f);
+            border-radius: 15px 15px 5px 5px;
+            margin: 0 auto;
+            position: relative;
+            box-shadow: 
+                inset -8px -8px 15px rgba(0,0,0,0.2),
+                inset 5px 5px 10px rgba(255,255,255,0.1),
+                0 5px 20px rgba(0,0,0,0.3);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .torso-3d::after {
+            content: 'TRAINER';
+            position: absolute;
+            top: 40px; left: 50%; transform: translateX(-50%);
+            color: white; font-size: 0.6rem; font-weight: 900;
+            letter-spacing: 2px; opacity: 0.7;
+        }
+        
+        .abs-3d {
+            position: absolute;
+            top: 25px; left: 50%; transform: translateX(-50%);
+            display: flex; flex-direction: column; gap: 3px;
+        }
+        
+        .ab-line {
+            width: 20px; height: 3px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+        }
+        
+        /* Arms Container */
+        .arms-container {
+            display: flex; justify-content: space-between;
+            margin-top: -78px;
+            padding: 0 8px;
+            z-index: 5;
+            position: relative;
+        }
+        
+        .arm-3d {
+            width: 20px; height: 75px;
+            background: linear-gradient(90deg, var(--skin-dark), var(--skin));
+            border-radius: 12px;
+            transform-origin: top center;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                inset -3px -3px 8px rgba(0,0,0,0.15),
+                0 3px 10px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        
+        .arm-3d::after {
+            content: '';
+            position: absolute;
+            bottom: -8px; left: 50%; transform: translateX(-50%);
+            width: 22px; height: 22px;
+            background: var(--skin);
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .arm-3d.left { transform: rotate(12deg); }
+        .arm-3d.right { transform: rotate(-12deg); }
+        
+        /* Legs Container */
+        .legs-container {
+            display: flex; justify-content: space-around;
+            margin-top: 0;
+        }
+        
+        .leg-3d {
+            width: 26px; height: 85px;
+            background: linear-gradient(180deg, var(--shorts), #1db954);
+            border-radius: 8px 8px 12px 12px;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                inset -4px -4px 10px rgba(0,0,0,0.2),
+                0 3px 15px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        
+        .leg-3d::after {
+            content: '';
+            position: absolute;
+            bottom: -8px; left: 50%; transform: translateX(-50%);
+            width: 32px; height: 14px;
+            background: var(--shoe);
+            border-radius: 15px 15px 5px 5px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+        }
+        
+        /* Exercise Specific Animations */
+        .exercise-active.jumping-jacks .arm-3d.left { transform: rotate(-155deg); }
+        .exercise-active.jumping-jacks .arm-3d.right { transform: rotate(155deg); }
+        .exercise-active.jumping-jacks .leg-3d.left { transform: translateX(-22px) rotate(-20deg); }
+        .exercise-active.jumping-jacks .leg-3d.right { transform: translateX(22px) rotate(20deg); }
+        .exercise-active.jumping-jacks .head-3d { animation: headBob 0.5s ease-in-out infinite; }
+        
+        .exercise-active.squats .torso-3d { transform: translateY(35px) scaleY(0.65); }
+        .exercise-active.squats .legs-container { transform: translateY(25px); }
+        .exercise-active.squats .arm-3d.left { transform: rotate(40deg) translateY(15px); }
+        .exercise-active.squats .arm-3d.right { transform: rotate(-40deg) translateY(15px); }
+        
+        .exercise-active.pushups .torso-3d { transform: rotate(-70deg) translateX(20px); }
+        .exercise-active.pushups .arm-3d.left { transform: rotate(-100deg); }
+        .exercise-active.pushups .arm-3d.right { transform: rotate(100deg); }
+        
+        .exercise-active.lunges .leg-3d.left { transform: translateX(-25px) rotate(-25deg) scaleY(0.9); }
+        .exercise-active.lunges .leg-3d.right { transform: translateX(15px) rotate(10deg); }
+        .exercise-active.lunges .torso-3d { transform: translateY(12px); }
+        
+        .exercise-active.high-knees .leg-3d.left { animation: highKnee 0.4s ease-in-out infinite; }
+        .exercise-active.high-knees .leg-3d.right { animation: highKnee 0.4s ease-in-out 0.2s infinite; }
+        
+        @keyframes headBob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+        
+        @keyframes highKnee {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-30px); }
+        }
+        
+        /* Trainer Label */
+        .trainer-label {
+            position: absolute;
+            bottom: 15px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.6); color: #ffd700;
+            padding: 5px 15px; border-radius: 20px;
+            font-size: 0.8rem; font-weight: 600;
+            z-index: 20;
+            backdrop-filter: blur(5px);
+        }
+        
+        .motivation-text {
+            position: absolute;
+            top: 20px; left: 50%; transform: translateX(-50%);
+            color: #ffd700; font-size: 1.1rem; font-weight: 600;
+            text-shadow: 0 0 20px rgba(255,215,0,0.5);
+            z-index: 20;
+            animation: floatText 2s ease-in-out infinite;
+        }
+        
+        @keyframes floatText {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+        
+        /* Controls Panel */
+        .controls-panel {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .controls-panel h3 {
+            text-align: center; color: #333; margin-bottom: 15px;
+        }
+        
+        .ex-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .ex-btn {
+            padding: 14px 10px;
+            border: 2px solid #e8e8e8;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+            color: #555;
+        }
+        
+        .ex-btn:hover {
+            border-color: #4CAF50;
+            background: #f1f8e9;
+            transform: translateY(-2px);
+        }
+        
+        .ex-btn.active {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border-color: #4CAF50;
+            box-shadow: 0 5px 15px rgba(76,175,80,0.3);
+        }
+        
+        .ex-btn .ico { display: block; font-size: 1.8rem; margin-bottom: 4px; }
+        
+        .timer-box {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            margin: 15px 0;
+        }
+        
+        .timer-big {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: #4CAF50;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 3px;
+        }
+        
+        .rep-display {
+            font-size: 1.2rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .btn-action {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 5px 0;
+            transition: all 0.3s;
+            letter-spacing: 1px;
+        }
+        
+        .btn-start-workout {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            box-shadow: 0 5px 20px rgba(76,175,80,0.3);
+        }
+        
+        .btn-start-workout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(76,175,80,0.4);
+        }
+        
+        .btn-stop-workout {
+            background: #ff4757;
+            color: white;
+        }
+        
+        .stats-mini {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .mini-stat {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .mini-stat .val {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        
+        .mini-stat .lbl {
+            font-size: 0.7rem;
+            color: #999;
+            margin-top: 2px;
+        }
+        
+        @media (max-width: 900px) {
+            .studio-container {
+                grid-template-columns: 1fr;
+            }
+            .trainer-stage {
+                min-height: 400px;
+            }
+        }
+
+        .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .info-row .lbl { color: #888; }
+        .info-row .val { font-weight: 500; }
+        .badge { padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; }
+        .badge-active { background: #d4edda; color: #155724; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>🏋️ GymPro Member</h1>
+        <div style="display:flex;align-items:center;gap:15px;">
+            <span id="userName">Member</span>
+            <div class="avatar-circle" id="userInitial">M</div>
+            <button class="btn-logout" onclick="logout()">🚪 Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="welcome-card">
+            <h2>Welcome back, <span id="welcomeName">Member</span>! 💪</h2>
+            <p style="opacity:0.9;">Your fitness journey continues today.</p>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('overview', this)">📊 Overview</div>
+            <div class="tab" onclick="switchTab('workout', this)">🎮 3D Virtual Trainer</div>
+            <div class="tab" onclick="switchTab('profile', this)">👤 Profile</div>
+        </div>
+
+        <!-- Overview Tab -->
+        <div class="tab-content active" id="tab-overview">
+            <div class="stats-row">
+                <div class="stat-box"><div class="num">12</div><div class="lbl">Workouts</div></div>
+                <div class="stat-box"><div class="num">320m</div><div class="lbl">Time</div></div>
+                <div class="stat-box"><div class="num">2,450</div><div class="lbl">Calories</div></div>
+                <div class="stat-box"><div class="num">5 🔥</div><div class="lbl">Day Streak</div></div>
+            </div>
+            <div class="card">
+                <h3>📋 My Workout Plan</h3>
+                <p style="color:#888;">Your trainer will create a plan. <a href="#" onclick="switchTab('workout', document.querySelectorAll('.tab')[1])" style="color:#4CAF50;">Start 3D workout now!</a></p>
+            </div>
+        </div>
+
+        <!-- 3D Virtual Trainer Tab -->
+        <div class="tab-content" id="tab-workout">
+            <div class="studio-container">
+                <!-- 3D TRAINER STAGE -->
+                <div class="trainer-stage">
+                    <div class="stage-lights">
+                        <div class="stage-light"></div>
+                        <div class="stage-light"></div>
+                        <div class="stage-light"></div>
+                    </div>
+                    <div class="mirror-wall"></div>
+                    <div class="motivation-text" id="motivation">👨‍🏫 Follow the trainer!</div>
+                    
+                    <!-- 3D Human Figure -->
+                    <div class="trainer-3d" id="trainer3D">
+                        <div class="head-3d">
+                            <div class="hair-3d"></div>
+                            <div class="face-details">
+                                <div class="eyes-3d">
+                                    <div class="eye-3d"><div class="eyebrow"></div></div>
+                                    <div class="eye-3d"><div class="eyebrow"></div></div>
+                                </div>
+                                <div class="nose-3d"></div>
+                                <div class="mouth-3d"></div>
+                            </div>
+                        </div>
+                        <div class="neck-3d"></div>
+                        <div class="arms-container">
+                            <div class="arm-3d left"></div>
+                            <div class="arm-3d right"></div>
+                        </div>
+                        <div class="torso-3d">
+                            <div class="abs-3d">
+                                <div class="ab-line"></div>
+                                <div class="ab-line"></div>
+                                <div class="ab-line"></div>
+                            </div>
+                        </div>
+                        <div class="legs-container">
+                            <div class="leg-3d left"></div>
+                            <div class="leg-3d right"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="trainer-label">🏆 PRO TRAINER - Follow My Moves!</div>
+                    <div class="stage-floor"></div>
+                </div>
+
+                <!-- Controls -->
+                <div class="controls-panel">
+                    <h3>🏋️ Choose Exercise</h3>
+                    <div class="ex-grid">
+                        <button class="ex-btn active" onclick="selectExercise('jumping-jacks', this)">
+                            <span class="ico">⭐</span> Jumping Jacks
+                        </button>
+                        <button class="ex-btn" onclick="selectExercise('squats', this)">
+                            <span class="ico">🦵</span> Squats
+                        </button>
+                        <button class="ex-btn" onclick="selectExercise('lunges', this)">
+                            <span class="ico">🚶</span> Lunges
+                        </button>
+                        <button class="ex-btn" onclick="selectExercise('pushups', this)">
+                            <span class="ico">💪</span> Push-ups
+                        </button>
+                        <button class="ex-btn" onclick="selectExercise('high-knees', this)">
+                            <span class="ico">🏃</span> High Knees
+                        </button>
+                        <button class="ex-btn" onclick="selectExercise('burpees', this)">
+                            <span class="ico">🔥</span> Burpees
+                        </button>
+                    </div>
+
+                    <div class="timer-box">
+                        <div class="timer-big" id="timerDisplay">00:00</div>
+                        <div class="rep-display">Reps: <strong id="repCount">0</strong></div>
+                    </div>
+
+                    <button class="btn-action btn-start-workout" id="btnStart" onclick="startWorkout()">
+                        ▶ START WORKOUT
+                    </button>
+                    <button class="btn-action btn-stop-workout" onclick="stopWorkout()">
+                        ⏹ STOP
+                    </button>
+
+                    <div class="stats-mini">
+                        <div class="mini-stat">
+                            <div class="val" id="calCount">0</div>
+                            <div class="lbl">Calories</div>
+                        </div>
+                        <div class="mini-stat">
+                            <div class="val" id="totalReps">0</div>
+                            <div class="lbl">Total Reps</div>
+                        </div>
+                        <div class="mini-stat">
+                            <div class="val" id="setCount">0</div>
+                            <div class="lbl">Sets</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Tab -->
+        <div class="tab-content" id="tab-profile">
+            <div class="card">
+                <h3>👤 My Information</h3>
+                <div class="info-row"><span class="lbl">Name</span><span class="val" id="profName">-</span></div>
+                <div class="info-row"><span class="lbl">Email</span><span class="val" id="profEmail">-</span></div>
+                <div class="info-row"><span class="lbl">Phone</span><span class="val" id="profPhone">-</span></div>
+                <div class="info-row"><span class="lbl">Status</span><span class="val"><span class="badge badge-active">Active</span></span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (!token) window.location.href = '/index.html';
+
+        document.getElementById('userName').textContent = user.name || 'Member';
+        document.getElementById('welcomeName').textContent = user.name || 'Member';
+        document.getElementById('userInitial').textContent = (user.name || 'M').charAt(0).toUpperCase();
+        document.getElementById('profName').textContent = user.name || 'N/A';
+        document.getElementById('profEmail').textContent = user.email || 'N/A';
+        document.getElementById('profPhone').textContent = user.phone || 'Not set';
+
+        function switchTab(tabName, btn) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        // ============================================
+        // 3D VIRTUAL WORKOUT ENGINE
+        // ============================================
+        let currentExercise = 'jumping-jacks';
+        let isWorking = false;
+        let timer = 0;
+        let interval;
+        let reps = 0;
+        let totalRepsAll = 0;
+        let calories = 0;
+        let sets = 0;
+
+        const exercises = {
+            'jumping-jacks': 'Jumping Jacks ⭐',
+            'squats': 'Squats 🦵',
+            'lunges': 'Lunges 🚶',
+            'pushups': 'Push-ups 💪',
+            'high-knees': 'High Knees 🏃',
+            'burpees': 'Burpees 🔥'
+        };
+
+        const motivations = [
+            '🔥 You\'re crushing it!', '💪 Keep that form!', '⭐ Amazing energy!',
+            '🚀 Don\'t stop now!', '💯 Perfect reps!', '👏 Great work!',
+            '🎯 Stay focused!', '🏆 Champion mode!', '⚡ Power through!'
+        ];
+
+        function selectExercise(ex, btn) {
+            if (isWorking) return;
+            currentExercise = ex;
+            document.querySelectorAll('.ex-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('trainer3D').className = 'trainer-3d';
+            document.getElementById('motivation').textContent = '👨‍🏫 ' + exercises[ex];
+            reps = 0;
+            document.getElementById('repCount').textContent = '0';
+        }
+
+        function startWorkout() {
+            if (isWorking) return;
+            isWorking = true;
+            
+            document.getElementById('btnStart').textContent = '⏸ PAUSE';
+            document.getElementById('btnStart').onclick = pauseWorkout;
+            document.getElementById('trainer3D').classList.add('exercise-active', currentExercise);
+            document.getElementById('motivation').textContent = '🔥 Let\'s GO! Follow the trainer!';
+            
+            interval = setInterval(() => {
+                timer++;
+                updateTimer();
+                
+                if (timer % 2 === 0) {
+                    reps++;
+                    totalRepsAll++;
+                    document.getElementById('repCount').textContent = reps;
+                    document.getElementById('totalReps').textContent = totalRepsAll;
+                }
+                
+                if (timer % 5 === 0) {
+                    calories += Math.floor(Math.random() * 4) + 2;
+                    document.getElementById('calCount').textContent = calories;
+                }
+                
+                if (reps >= 15 && reps % 15 === 0) {
+                    sets = Math.floor(reps / 15);
+                    document.getElementById('setCount').textContent = sets;
+                }
+                
+                if (timer % 6 === 0) {
+                    document.getElementById('motivation').textContent = motivations[Math.floor(Math.random() * motivations.length)];
+                }
+            }, 1000);
+        }
+
+        function pauseWorkout() {
+            isWorking = false;
+            clearInterval(interval);
+            document.getElementById('btnStart').textContent = '▶ RESUME';
+            document.getElementById('btnStart').onclick = startWorkout;
+            document.getElementById('trainer3D').classList.remove('exercise-active', currentExercise);
+            document.getElementById('motivation').textContent = '⏸ Paused - Take a breath';
+        }
+
+        function stopWorkout() {
+            isWorking = false;
+            clearInterval(interval);
+            document.getElementById('trainer3D').classList.remove('exercise-active', currentExercise);
+            document.getElementById('btnStart').textContent = '▶ START WORKOUT';
+            document.getElementById('btnStart').onclick = startWorkout;
+            document.getElementById('motivation').textContent = '✅ Great workout! See you soon!';
+            
+            const mins = Math.floor(timer / 60);
+            const secs = timer % 60;
+            alert(`🎉 WORKOUT COMPLETE!\n\n🏋️ ${exercises[currentExercise]}\n⏱️ ${mins}m ${secs}s\n🔄 ${reps} reps\n🔥 ~${calories} calories\n\n💪 Great job! Keep it up!`);
+            
+            document.getElementById('totalWorkouts') && (document.getElementById('totalWorkouts').textContent = parseInt(document.getElementById('totalWorkouts').textContent) + 1);
+            
+            timer = 0; reps = 0;
+            updateTimer();
+            document.getElementById('repCount').textContent = '0';
+        }
+
+        function updateTimer() {
+            const m = Math.floor(timer / 60);
+            const s = timer % 60;
+            document.getElementById('timerDisplay').textContent = 
+                `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        }
+
+        function logout() { localStorage.clear(); window.location.href = '/index.html'; }
+    </script>
+</body>
+</html>

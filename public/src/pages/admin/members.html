@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Members - GymPro</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; }
+        .navbar { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .navbar a { color: white; text-decoration: none; margin-right: 20px; }
+        .btn { padding: 8px 18px; border: none; border-radius: 6px; cursor: pointer; }
+        .btn-back { background: rgba(255,255,255,0.2); color: white; }
+        .btn-add { background: #4CAF50; color: white; }
+        .btn-logout { background: #e74c3c; color: white; }
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: #f8f9fa; padding: 14px; text-align: left; font-weight: 600; }
+        td { padding: 14px; border-bottom: 1px solid #f0f0f0; }
+        .badge { padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; }
+        .badge-active { background: #d4edda; color: #155724; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { background: white; margin: 50px auto; padding: 30px; border-radius: 12px; width: 90%; max-width: 500px; }
+        .modal-content input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; }
+        .modal-content h2 { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div>
+            <a href="dashboard.html">📊 Dashboard</a>
+            <span style="color: rgba(255,255,255,0.5);">|</span>
+            <span style="margin-left: 20px;">👥 Members Management</span>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn btn-add" onclick="showAddModal()">➕ Add Member</button>
+            <button class="btn btn-logout" onclick="logout()">🚪 Logout</button>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="card">
+            <h2>All Members</h2>
+            <div id="memberCount" style="color: #888; margin-top: 5px;"></div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Plan</th>
+                        <th>Status</th>
+                        <th>Join Date</th>
+                    </tr>
+                </thead>
+                <tbody id="membersTable">
+                    <tr><td colspan="5" style="text-align:center;">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add Member Modal -->
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <h2>Add New Member</h2>
+            <input type="text" id="newName" placeholder="Full Name">
+            <input type="email" id="newEmail" placeholder="Email">
+            <input type="password" id="newPassword" placeholder="Password">
+            <input type="text" id="newPhone" placeholder="Phone">
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-add" onclick="addMember()" style="flex:1;">Save</button>
+                <button class="btn" onclick="closeModal()" style="flex:1; background:#ddd;">Cancel</button>
+            </div>
+            <div id="addMessage" style="margin-top:10px;"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        if (!token) window.location.href = '/index.html';
+        
+        async function loadMembers() {
+            try {
+                const res = await fetch(API_URL + '/members', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const members = await res.json();
+                
+                document.getElementById('memberCount').textContent = `Total: ${members.length} members`;
+                
+                document.getElementById('membersTable').innerHTML = members.map(m => `
+                    <tr>
+                        <td><strong>${m.name || 'N/A'}</strong></td>
+                        <td>${m.email || 'N/A'}</td>
+                        <td>${m.planName || 'Basic'}</td>
+                        <td><span class="badge badge-active">${m.status || 'active'}</span></td>
+                        <td>${m.joinDate || 'N/A'}</td>
+                    </tr>
+                `).join('') || '<tr><td colspan="5" style="text-align:center;">No members found</td></tr>';
+            } catch (e) {
+                document.getElementById('membersTable').innerHTML = '<tr><td colspan="5" style="text-align:center;color:red;">Cannot load members</td></tr>';
+            }
+        }
+        
+        function showAddModal() {
+            document.getElementById('addModal').style.display = 'block';
+        }
+        
+        function closeModal() {
+            document.getElementById('addModal').style.display = 'none';
+        }
+        
+        async function addMember() {
+            const name = document.getElementById('newName').value;
+            const email = document.getElementById('newEmail').value;
+            const password = document.getElementById('newPassword').value;
+            const phone = document.getElementById('newPhone').value;
+            
+            try {
+                const res = await fetch(API_URL + '/members', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ name, email, password, phone })
+                });
+                
+                const data = await res.json();
+                
+                if (res.ok) {
+                    document.getElementById('addMessage').innerHTML = '<span style="color:green;">✅ Member added!</span>';
+                    setTimeout(() => {
+                        closeModal();
+                        loadMembers();
+                    }, 1000);
+                } else {
+                    document.getElementById('addMessage').innerHTML = `<span style="color:red;">❌ ${data.error}</span>`;
+                }
+            } catch (e) {
+                document.getElementById('addMessage').innerHTML = '<span style="color:red;">❌ Error adding member</span>';
+            }
+        }
+        
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/index.html';
+        }
+        
+        loadMembers();
+    </script>
+</body>
+</html>
