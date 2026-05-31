@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Equipment - GymPro Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; min-height: 100vh; }
+        .navbar { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .navbar a { color: white; text-decoration: none; margin-right: 20px; }
+        .btn { padding: 8px 18px; border: none; border-radius: 6px; cursor: pointer; }
+        .btn-add { background: #4CAF50; color: white; }
+        .btn-logout { background: #e74c3c; color: white; }
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        
+        .equipment-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .equip-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); border-left: 5px solid #4CAF50; transition: transform 0.2s; }
+        .equip-card:hover { transform: translateY(-3px); }
+        .equip-card.poor { border-left-color: #f39c12; }
+        .equip-card.out { border-left-color: #e74c3c; }
+        .equip-card h3 { color: #333; margin-bottom: 10px; }
+        .equip-card .info { color: #666; font-size: 0.9rem; margin: 5px 0; }
+        .badge { padding: 4px 10px; border-radius: 15px; font-size: 0.75rem; }
+        .badge-good { background: #d4edda; color: #155724; }
+        .badge-fair { background: #fff3cd; color: #856404; }
+        .badge-poor { background: #f8d7da; color: #721c24; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { background: white; margin: 50px auto; padding: 30px; border-radius: 12px; width: 90%; max-width: 500px; }
+        .modal-content input, .modal-content select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; }
+        .modal-buttons { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-buttons button { flex: 1; padding: 12px; border: none; border-radius: 6px; cursor: pointer; }
+        .btn-save { background: #4CAF50; color: white; }
+        .btn-close { background: #ddd; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div>
+            <a href="dashboard.html">📊 Dashboard</a>
+            <span style="color: #4CAF50; font-weight: bold;">🏋️ Equipment</span>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn btn-add" onclick="showAddModal()">➕ Add Equipment</button>
+            <button class="btn btn-logout" onclick="logout()">🚪 Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2 style="margin-bottom:20px;">Gym Equipment</h2>
+        <div class="equipment-grid" id="equipmentGrid">
+            <div style="text-align:center;padding:40px;color:#888;">Loading equipment...</div>
+        </div>
+    </div>
+
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <h3>🏋️ Add Equipment</h3>
+            <input type="text" id="equipName" placeholder="Equipment name">
+            <input type="text" id="equipType" placeholder="Type (Cardio, Strength, etc.)">
+            <input type="text" id="equipBrand" placeholder="Brand">
+            <input type="number" id="equipQty" placeholder="Quantity" min="1" value="1">
+            <select id="equipCondition">
+                <option value="excellent">Excellent</option>
+                <option value="good" selected>Good</option>
+                <option value="fair">Fair</option>
+                <option value="poor">Poor</option>
+            </select>
+            <div class="modal-buttons">
+                <button class="btn-save" onclick="addEquipment()">Save</button>
+                <button class="btn-close" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/index.html';
+
+        // Demo equipment data
+        const demoEquipment = [
+            { id: 1, name: 'Treadmill', type: 'Cardio', brand: 'LifeFitness', quantity: 5, condition: 'good' },
+            { id: 2, name: 'Bench Press', type: 'Strength', brand: 'Rogue', quantity: 3, condition: 'excellent' },
+            { id: 3, name: 'Dumbbell Set', type: 'Free Weights', brand: 'Bowflex', quantity: 10, condition: 'good' },
+            { id: 4, name: 'Squat Rack', type: 'Strength', brand: 'Rogue', quantity: 2, condition: 'good' },
+            { id: 5, name: 'Elliptical', type: 'Cardio', brand: 'Precor', quantity: 4, condition: 'fair' },
+            { id: 6, name: 'Cable Machine', type: 'Strength', brand: 'Technogym', quantity: 2, condition: 'good' },
+            { id: 7, name: 'Spin Bike', type: 'Cardio', brand: 'Peloton', quantity: 6, condition: 'excellent' },
+            { id: 8, name: 'Leg Press', type: 'Strength', brand: 'Hammer Strength', quantity: 2, condition: 'fair' }
+        ];
+
+        function loadEquipment() {
+            const grid = document.getElementById('equipmentGrid');
+            grid.innerHTML = demoEquipment.map(e => `
+                <div class="equip-card ${e.condition === 'poor' ? 'poor' : e.condition === 'fair' ? '' : ''}">
+                    <h3>${e.name}</h3>
+                    <div class="info">📋 Type: ${e.type}</div>
+                    <div class="info">🏷️ Brand: ${e.brand}</div>
+                    <div class="info">📦 Quantity: ${e.quantity}</div>
+                    <div class="info">🔧 Condition: <span class="badge badge-${e.condition}">${e.condition}</span></div>
+                </div>
+            `).join('');
+        }
+
+        function addEquipment() {
+            const name = document.getElementById('equipName').value;
+            const type = document.getElementById('equipType').value;
+            const brand = document.getElementById('equipBrand').value;
+            const qty = parseInt(document.getElementById('equipQty').value);
+            const condition = document.getElementById('equipCondition').value;
+
+            if (!name || !type) {
+                alert('Please fill at least name and type');
+                return;
+            }
+
+            demoEquipment.push({
+                id: demoEquipment.length + 1,
+                name, type, brand, quantity: qty, condition
+            });
+
+            closeModal();
+            loadEquipment();
+            alert('✅ Equipment added!');
+        }
+
+        function showAddModal() { document.getElementById('addModal').style.display = 'block'; }
+        function closeModal() { document.getElementById('addModal').style.display = 'none'; }
+        function logout() { localStorage.clear(); window.location.href = '/index.html'; }
+
+        loadEquipment();
+    </script>
+</body>
+</html>
