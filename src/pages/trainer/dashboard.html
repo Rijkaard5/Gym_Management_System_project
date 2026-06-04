@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trainer Dashboard - GymPro</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f5f6fa; min-height: 100vh; }
+        .navbar { background: linear-gradient(135deg, #1565c0, #1976d2); color: white; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; }
+        .btn-logout { padding: 8px 16px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; cursor: pointer; }
+        .container { max-width: 1100px; margin: 20px auto; padding: 0 15px; }
+        .welcome-card { background: linear-gradient(135deg, #1565c0, #1976d2); color: white; padding: 25px; border-radius: 12px; margin-bottom: 20px; }
+        
+        .tabs { display: flex; background: white; border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .tab { flex: 1; padding: 15px; text-align: center; cursor: pointer; font-weight: 600; color: #888; border-bottom: 3px solid transparent; }
+        .tab.active { color: #1565c0; border-bottom-color: #1565c0; background: #e3f2fd; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 20px; }
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .stat-box { background: white; padding: 20px; border-radius: 10px; text-align: center; }
+        .stat-box .num { font-size: 1.8rem; font-weight: bold; color: #1565c0; }
+        .stat-box .lbl { font-size: 0.8rem; color: #888; }
+        
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f5f5f5; padding: 12px; text-align: left; font-weight: 600; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        .badge { padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; }
+        .badge-active { background: #d4edda; color: #155724; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>🏋️ Trainer Dashboard</h1>
+        <div>
+            <span id="userName" style="margin-right:15px;">Trainer</span>
+            <button class="btn-logout" onclick="logout()">🚪 Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="welcome-card">
+            <h2>Welcome, <span id="welcomeName">Trainer</span>! 👨‍🏫</h2>
+            <p>Manage your clients and training sessions</p>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('clients', this)">👥 My Clients</div>
+            <div class="tab" onclick="switchTab('plans', this)">📋 Workout Plans</div>
+            <div class="tab" onclick="switchTab('schedule', this)">📅 Schedule</div>
+        </div>
+
+        <div class="tab-content active" id="tab-clients">
+            <div class="stats-row">
+                <div class="stat-box"><div class="num">5</div><div class="lbl">Active Clients</div></div>
+                <div class="stat-box"><div class="num">12</div><div class="lbl">Sessions This Week</div></div>
+                <div class="stat-box"><div class="num">3</div><div class="lbl">Plans Created</div></div>
+            </div>
+            <div class="card">
+                <h3>My Clients</h3>
+                <table>
+                    <thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Progress</th></tr></thead>
+                    <tbody>
+                        <tr><td>John Doe</td><td>member@gympro.com</td><td><span class="badge badge-active">Active</span></td><td>75%</td></tr>
+                        <tr><td colspan="4" style="color:#888;text-align:center;">Add more members to see them here</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-content" id="tab-plans">
+            <div class="card">
+                <h3>Workout Plans</h3>
+                <p style="color:#888;">Create personalized workout plans for your clients.</p>
+                <button style="margin-top:15px;padding:10px 20px;background:#1565c0;color:white;border:none;border-radius:6px;cursor:pointer;">➕ Create New Plan</button>
+            </div>
+        </div>
+
+        <div class="tab-content" id="tab-schedule">
+            <div class="card">
+                <h3>Today's Schedule</h3>
+                <table>
+                    <thead><tr><th>Time</th><th>Client</th><th>Type</th><th>Status</th></tr></thead>
+                    <tbody>
+                        <tr><td>09:00 AM</td><td>John Doe</td><td>Strength Training</td><td><span class="badge badge-active">Confirmed</span></td></tr>
+                        <tr><td>11:00 AM</td><td>-</td><td>-</td><td>Available</td></tr>
+                        <tr><td>02:00 PM</td><td>-</td><td>-</td><td>Available</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (!token) window.location.href = '/index.html';
+        document.getElementById('userName').textContent = user.name || 'Trainer';
+        document.getElementById('welcomeName').textContent = user.name || 'Trainer';
+        
+        function switchTab(tabName, btn) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            btn.classList.add('active');
+        }
+        function logout() { localStorage.clear(); window.location.href = '/index.html'; }
+    </script>
+</body>
+</html>

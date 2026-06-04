@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sessions - GymPro Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; min-height: 100vh; }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .navbar a { color: white; text-decoration: none; margin-right: 20px; font-weight: 500; }
+        .navbar a:hover { text-decoration: underline; }
+        .btn { padding: 8px 18px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; transition: all 0.3s; }
+        .btn-add { background: #4CAF50; color: white; }
+        .btn-add:hover { background: #45a049; }
+        .btn-logout { background: #e74c3c; color: white; }
+        .btn-logout:hover { background: #c0392b; }
+        .btn-action { padding: 5px 12px; margin: 2px; font-size: 0.8rem; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-confirm { background: #3498db; color: white; }
+        .btn-complete { background: #27ae60; color: white; }
+        .btn-cancel { background: #e74c3c; color: white; }
+        
+        .container { max-width: 1300px; margin: 30px auto; padding: 0 20px; }
+        
+        .header-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-section h2 { color: #333; }
+        
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .stat-mini {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+        .stat-mini .num { font-size: 2rem; font-weight: bold; }
+        .stat-mini .lbl { color: #888; font-size: 0.85rem; margin-top: 5px; }
+        .stat-mini:nth-child(1) .num { color: #4CAF50; }
+        .stat-mini:nth-child(2) .num { color: #3498db; }
+        .stat-mini:nth-child(3) .num { color: #f39c12; }
+        .stat-mini:nth-child(4) .num { color: #e74c3c; }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { background: #f8f9fa; padding: 14px; text-align: left; font-weight: 600; color: #555; font-size: 0.85rem; text-transform: uppercase; }
+        td { padding: 14px; border-bottom: 1px solid #f0f0f0; }
+        tbody tr:hover { background: #f8f9fa; }
+        
+        .badge { padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; }
+        .badge-scheduled { background: #e3f2fd; color: #1565c0; }
+        .badge-confirmed { background: #d4edda; color: #155724; }
+        .badge-completed { background: #e8f5e9; color: #2e7d32; }
+        .badge-cancelled { background: #f8d7da; color: #721c24; }
+        .badge-noshow { background: #fff3cd; color: #856404; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { background: white; margin: 50px auto; padding: 30px; border-radius: 12px; width: 90%; max-width: 550px; max-height: 80vh; overflow-y: auto; }
+        .modal-content h3 { margin-bottom: 20px; color: #333; }
+        .modal-content input, .modal-content select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; }
+        .modal-content label { font-weight: 500; color: #555; display: block; margin-top: 10px; }
+        .modal-buttons { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-buttons button { flex: 1; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; }
+        .btn-save { background: #4CAF50; color: white; }
+        .btn-close { background: #ddd; color: #333; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div>
+            <a href="dashboard.html">📊 Dashboard</a>
+            <a href="members.html">👥 Members</a>
+            <a href="trainers.html">👨‍🏫 Trainers</a>
+            <span style="color: #4CAF50; font-weight: bold;">📅 Sessions</span>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn btn-add" onclick="showAddModal()">➕ Book Session</button>
+            <button class="btn btn-logout" onclick="logout()">🚪 Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="stats-row">
+            <div class="stat-mini"><div class="num" id="totalSessions">0</div><div class="lbl">Total Sessions</div></div>
+            <div class="stat-mini"><div class="num" id="todaySessions">0</div><div class="lbl">Today's Sessions</div></div>
+            <div class="stat-mini"><div class="num" id="pendingSessions">0</div><div class="lbl">Pending</div></div>
+            <div class="stat-mini"><div class="num" id="completedSessions">0</div><div class="lbl">Completed</div></div>
+        </div>
+
+        <div class="card">
+            <h3>All Training Sessions</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Member</th>
+                        <th>Trainer</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="sessionsTable">
+                    <tr><td colspan="7" style="text-align:center; padding:30px;">No sessions yet. Book your first session!</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add Session Modal -->
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <h3>📅 Book New Session</h3>
+            <label>Member</label>
+            <select id="sessionMember">
+                <option value="">Select member...</option>
+            </select>
+            <label>Trainer</label>
+            <select id="sessionTrainer">
+                <option value="">Select trainer...</option>
+            </select>
+            <label>Date</label>
+            <input type="date" id="sessionDate" min="">
+            <label>Time</label>
+            <input type="time" id="sessionTime">
+            <label>Duration (minutes)</label>
+            <select id="sessionDuration">
+                <option value="30">30 minutes</option>
+                <option value="45">45 minutes</option>
+                <option value="60" selected>60 minutes</option>
+                <option value="90">90 minutes</option>
+            </select>
+            <div class="modal-buttons">
+                <button class="btn-save" onclick="bookSession()">📅 Book Session</button>
+                <button class="btn-close" onclick="closeModal()">Cancel</button>
+            </div>
+            <div id="addMessage" style="margin-top:15px;"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        if (!token) window.location.href = '/index.html';
+
+        // Set min date to today
+        document.getElementById('sessionDate').min = new Date().toISOString().split('T')[0];
+
+        async function loadSessions() {
+            try {
+                const res = await fetch(API_URL + '/sessions', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const sessions = await res.json();
+                
+                // Update stats
+                document.getElementById('totalSessions').textContent = sessions.length;
+                document.getElementById('todaySessions').textContent = sessions.filter(s => s.date === new Date().toISOString().split('T')[0]).length;
+                document.getElementById('pendingSessions').textContent = sessions.filter(s => s.status === 'scheduled').length;
+                document.getElementById('completedSessions').textContent = sessions.filter(s => s.status === 'completed').length;
+                
+                // Display sessions
+                const tbody = document.getElementById('sessionsTable');
+                if (sessions.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:#888;">📅 No sessions yet. Click "Book Session" to create one!</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = sessions.map(s => `
+                    <tr>
+                        <td>#${s.id}</td>
+                        <td><strong>${s.memberName || 'Member #' + s.memberId}</strong></td>
+                        <td>${s.trainerName || 'Trainer #' + s.trainerId}</td>
+                        <td>${s.date || 'N/A'}</td>
+                        <td>${s.time || 'N/A'}</td>
+                        <td><span class="badge badge-${s.status || 'scheduled'}">${s.status || 'scheduled'}</span></td>
+                        <td>
+                            <button class="btn-action btn-confirm" onclick="updateStatus(${s.id}, 'confirmed')">✓ Confirm</button>
+                            <button class="btn-action btn-complete" onclick="updateStatus(${s.id}, 'completed')">✓ Complete</button>
+                            <button class="btn-action btn-cancel" onclick="updateStatus(${s.id}, 'cancelled')">✗ Cancel</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                console.error('Load sessions error:', e);
+            }
+        }
+
+        async function loadMembersAndTrainers() {
+            try {
+                // Load members for dropdown
+                const memRes = await fetch(API_URL + '/members', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const members = await memRes.json();
+                document.getElementById('sessionMember').innerHTML = 
+                    '<option value="">Select member...</option>' +
+                    members.map(m => `<option value="${m.id}">${m.name || 'Member #' + m.id}</option>`).join('');
+
+                // Load trainers for dropdown
+                const trRes = await fetch(API_URL + '/trainers', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const trainers = await trRes.json();
+                document.getElementById('sessionTrainer').innerHTML = 
+                    '<option value="">Select trainer...</option>' +
+                    trainers.map(t => `<option value="${t.id}">${t.name || 'Trainer #' + t.id}</option>`).join('');
+            } catch (e) {
+                console.error('Load dropdowns error:', e);
+            }
+        }
+
+        async function bookSession() {
+            const memberId = document.getElementById('sessionMember').value;
+            const trainerId = document.getElementById('sessionTrainer').value;
+            const date = document.getElementById('sessionDate').value;
+            const time = document.getElementById('sessionTime').value;
+            const duration = document.getElementById('sessionDuration').value;
+            const msgDiv = document.getElementById('addMessage');
+
+            if (!memberId || !trainerId || !date || !time) {
+                msgDiv.innerHTML = '<span style="color:red;">❌ Please fill all fields</span>';
+                return;
+            }
+
+            try {
+                const res = await fetch(API_URL + '/sessions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({
+                        memberId: parseInt(memberId),
+                        trainerId: parseInt(trainerId),
+                        date,
+                        time,
+                        duration: parseInt(duration),
+                        status: 'scheduled'
+                    })
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    msgDiv.innerHTML = '<span style="color:green;">✅ Session booked successfully!</span>';
+                    setTimeout(() => { closeModal(); loadSessions(); }, 1000);
+                } else {
+                    msgDiv.innerHTML = `<span style="color:red;">❌ ${data.error}</span>`;
+                }
+            } catch (e) {
+                msgDiv.innerHTML = '<span style="color:red;">❌ Error booking session</span>';
+            }
+        }
+
+        async function updateStatus(id, status) {
+            // For now, update locally
+            alert(`Session #${id} marked as: ${status}`);
+            loadSessions();
+        }
+
+        function showAddModal() {
+            document.getElementById('addModal').style.display = 'block';
+            loadMembersAndTrainers();
+        }
+
+        function closeModal() {
+            document.getElementById('addModal').style.display = 'none';
+            document.getElementById('addMessage').innerHTML = '';
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/index.html';
+        }
+
+        loadSessions();
+    </script>
+</body>
+</html>
