@@ -1,0 +1,20 @@
+{
+  "name": "gym-management-frontend",
+  "version": "1.0.0",
+  "description": "Gym Management System Frontend",
+  "main": "public/index.html",
+  "scripts": {
+    "start": "live-server public --port=8080 --host=localhost",
+    "dev": "live-server public --port=8080 --host=localhost --watch"
+  },
+  "keywords": [
+    "gym",
+    "management",
+    "system"
+  ],
+  "author": "Your Team Name",
+  "license": "ISC",
+  "devDependencies": {
+    "live-server": "^1.2.0"
+  }
+}
