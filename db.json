@@ -1,0 +1,296 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Admin User",
+      "email": "admin@gympro.com",
+      "password": "$2a$10$B/Asz4cv/xCxClUDPFN3xuBkLTc5KmNvKQ4LwQurUCBpcJ/4z6DIS",
+      "role": "admin",
+      "phone": "1234567890",
+      "isActive": true,
+      "createdAt": "2026-06-06T12:08:22.429Z"
+    },
+    {
+      "id": 2,
+      "name": "Mike Johnson",
+      "email": "trainer@gympro.com",
+      "password": "$2a$10$74Q8gXluHv.nu1B31BuPWeynFiiPOzeFurVGDqAnWKd2PIo4cN0OC",
+      "role": "trainer",
+      "phone": "1234567891",
+      "isActive": true,
+      "createdAt": "2026-06-06T12:08:22.430Z"
+    },
+    {
+      "id": 3,
+      "name": "John Doe",
+      "email": "member@gympro.com",
+      "password": "$2a$10$D/S1yHG00UGIBg1BRNYDZONEjeQ5jZ6tjhkEjUs1cC3UwC3r4rqMG",
+      "role": "member",
+      "phone": "1234567892",
+      "isActive": true,
+      "createdAt": "2026-06-06T12:08:22.430Z"
+    },
+    {
+      "id": 4,
+      "name": "eben",
+      "email": "eben@gmail.com",
+      "password": "$2a$10$Dw7Y6sYmg7tncbbtgkfOG.mPy6w744nmS4gr9xgn5UA2V69Qu5yV.",
+      "role": "member",
+      "phone": "123456",
+      "isActive": true,
+      "createdAt": "2026-06-06T12:13:53.916Z"
+    },
+    {
+      "id": 5,
+      "name": "a",
+      "email": "a@gmail.com",
+      "password": "$2a$10$XFFgF9bDXAgkPcsoJjdTNu55PZUyr8y3KTYTQxZbtzVWVG3/gazoe",
+      "role": "member",
+      "phone": "111111111",
+      "isActive": true,
+      "createdAt": "2026-06-06T12:20:40.671Z"
+    },
+    {
+      "id": 6,
+      "name": "b",
+      "email": "b@gmail.com",
+      "password": "$2a$10$D3xjL4V5I3rZc2ih2AzhH.h6WzXqb0jkP3.ydhQIr/gQbgY/Qi4Tm",
+      "role": "trainer",
+      "phone": "111111",
+      "isActive": true,
+      "createdAt": "2026-06-06T12:22:04.550Z"
+    }
+  ],
+  "members": [
+    {
+      "id": 1,
+      "userId": 3,
+      "planName": "Premium Monthly",
+      "planId": 2,
+      "joinDate": "2024-01-01",
+      "expiryDate": "2026-12-31",
+      "status": "active",
+      "healthNotes": "",
+      "emergencyContact": ""
+    },
+    {
+      "id": 2,
+      "userId": 4,
+      "planName": "Basic Monthly",
+      "planId": 1,
+      "joinDate": "2026-06-06",
+      "expiryDate": "2026-07-06",
+      "status": "active",
+      "healthNotes": "",
+      "emergencyContact": ""
+    },
+    {
+      "id": 3,
+      "userId": 5,
+      "planName": "Basic Monthly",
+      "planId": 1,
+      "joinDate": "2026-06-06",
+      "expiryDate": "2026-07-06",
+      "status": "active",
+      "healthNotes": "feeling pains on my head",
+      "emergencyContact": "658555025"
+    }
+  ],
+  "trainers": [
+    {
+      "id": 1,
+      "userId": 2,
+      "speciality": "Strength Training",
+      "experienceYears": 5,
+      "certification": "NASM-CPT",
+      "hourlyRate": 50,
+      "bio": "Experienced strength and conditioning coach"
+    },
+    {
+      "id": 2,
+      "userId": 6,
+      "speciality": "yoga",
+      "experienceYears": 7,
+      "certification": "ace",
+      "hourlyRate": 100,
+      "bio": "love yoga"
+    }
+  ],
+  "membershipPlans": [
+    {
+      "id": 1,
+      "name": "Basic Monthly",
+      "type": "monthly",
+      "price": 29.99,
+      "durationDays": 30,
+      "features": [
+        "Gym Access",
+        "Locker Room"
+      ],
+      "isActive": true
+    },
+    {
+      "id": 2,
+      "name": "Premium Monthly",
+      "type": "monthly",
+      "price": 49.99,
+      "durationDays": 30,
+      "features": [
+        "Gym Access",
+        "Classes",
+        "Locker Room",
+        "Pool Access"
+      ],
+      "isActive": true
+    },
+    {
+      "id": 3,
+      "name": "Quarterly Plan",
+      "type": "quarterly",
+      "price": 79.99,
+      "durationDays": 90,
+      "features": [
+        "Gym Access",
+        "Classes",
+        "Locker Room",
+        "Pool Access",
+        "1 PT Session/month"
+      ],
+      "isActive": true
+    },
+    {
+      "id": 4,
+      "name": "Annual Premium",
+      "type": "annual",
+      "price": 499.99,
+      "durationDays": 365,
+      "features": [
+        "Gym Access",
+        "Unlimited Classes",
+        "Locker Room",
+        "Pool Access",
+        "4 PT Sessions/month",
+        "Nutrition Plan"
+      ],
+      "isActive": true
+    }
+  ],
+  "equipment": [
+    {
+      "id": 1,
+      "name": "Treadmill",
+      "type": "Cardio",
+      "brand": "LifeFitness",
+      "quantity": 5,
+      "conditionStatus": "good",
+      "lastMaintenance": "2025-01-10",
+      "nextMaintenance": "2026-07-10"
+    },
+    {
+      "id": 2,
+      "name": "Bench Press",
+      "type": "Strength",
+      "brand": "Rogue",
+      "quantity": 3,
+      "conditionStatus": "excellent",
+      "lastMaintenance": "2025-02-15",
+      "nextMaintenance": "2026-08-15"
+    },
+    {
+      "id": 3,
+      "name": "Dumbbell Set",
+      "type": "Free Weights",
+      "brand": "Bowflex",
+      "quantity": 10,
+      "conditionStatus": "good",
+      "lastMaintenance": "2025-01-20",
+      "nextMaintenance": "2026-07-20"
+    },
+    {
+      "id": 4,
+      "name": "Squat Rack",
+      "type": "Strength",
+      "brand": "Rogue",
+      "quantity": 2,
+      "conditionStatus": "good",
+      "lastMaintenance": "2025-03-01",
+      "nextMaintenance": "2026-09-01"
+    },
+    {
+      "id": 5,
+      "name": "Rowing Machine",
+      "type": "Cardio",
+      "brand": "Concept2",
+      "quantity": 4,
+      "conditionStatus": "excellent",
+      "lastMaintenance": "2025-04-01",
+      "nextMaintenance": "2026-10-01"
+    },
+    {
+      "id": 6,
+      "name": "iron",
+      "type": "cardio",
+      "brand": "hand",
+      "quantity": 1,
+      "conditionStatus": "excellent",
+      "nextMaintenance": "2026-06-06",
+      "createdAt": "2026-06-06T12:26:48.633Z"
+    }
+  ],
+  "attendance": [
+    {
+      "id": 1,
+      "memberId": 111111,
+      "checkIn": "2026-06-06T12:24:42.687Z",
+      "checkOut": null,
+      "method": "fingerprint"
+    }
+  ],
+  "sessions": [
+    {
+      "id": 1,
+      "memberId": 111111,
+      "trainerId": 222222,
+      "date": "2026-06-06",
+      "startTime": "13:23",
+      "endTime": "13:23",
+      "status": "scheduled",
+      "notes": "vacation",
+      "createdAt": "2026-06-06T12:24:07.053Z"
+    }
+  ],
+  "payments": [
+    {
+      "id": 1,
+      "memberId": 1,
+      "amount": 49.99,
+      "paymentDate": "2026-05-30T12:08:22.430Z",
+      "paymentMethod": "cash",
+      "status": "completed",
+      "planName": "Premium Monthly",
+      "receiptNumber": "RCP-001"
+    },
+    {
+      "id": 2,
+      "memberId": 1,
+      "amount": 49.99,
+      "paymentDate": "2026-04-30T12:08:22.430Z",
+      "paymentMethod": "credit_card",
+      "status": "completed",
+      "planName": "Premium Monthly",
+      "receiptNumber": "RCP-002"
+    }
+  ],
+  "notifications": [],
+  "passwordResets": [],
+  "nextId": {
+    "user": 7,
+    "member": 4,
+    "trainer": 3,
+    "session": 2,
+    "payment": 3,
+    "attendance": 2,
+    "equipment": 7,
+    "notification": 1
+  }
+}
