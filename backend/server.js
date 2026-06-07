@@ -32,7 +32,7 @@ const jwt = require("jsonwebtoken");
 const db = require("./db");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 const JWT_SECRET = process.env.JWT_SECRET || "gympro-secret-2024";
 const FRONTEND_DIR = path.join(__dirname, "..", "frontend", "public");
 
