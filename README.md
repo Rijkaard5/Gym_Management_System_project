@@ -1,162 +1,140 @@
-# 🏋️ GymPro — Gym Management System v2
+# accepts
 
-A complete, modern gym management system. **No database setup needed** — data is saved automatically to a local JSON file.
+[![NPM Version][npm-version-image]][npm-url]
+[![NPM Downloads][npm-downloads-image]][npm-url]
+[![Node.js Version][node-version-image]][node-version-url]
+[![Build Status][github-actions-ci-image]][github-actions-ci-url]
+[![Test Coverage][coveralls-image]][coveralls-url]
 
----
+Higher level content negotiation based on [negotiator](https://www.npmjs.com/package/negotiator).
+Extracted from [koa](https://www.npmjs.com/package/koa) for general use.
 
-## ✅ HOW TO RUN (3 Simple Steps)
+In addition to negotiator, it allows:
 
-### STEP 1 — Install Node.js (if not already installed)
-- Download from: **https://nodejs.org** (click the LTS version)
-- Run the installer, click Next → Next → Finish
-- Restart VS Code after installing
+- Allows types as an array or arguments list, ie `(['text/html', 'application/json'])`
+  as well as `('text/html', 'application/json')`.
+- Allows type shorthands such as `json`.
+- Returns `false` when no types match
+- Treats non-existent headers as `*`
 
----
+## Installation
 
-### STEP 2 — Open in VS Code
-1. Open **Visual Studio Code**
-2. Go to `File` → `Open Folder`
-3. Select the **`gym-management-system`** folder
-4. Click **Open**
+This is a [Node.js](https://nodejs.org/en/) module available through the
+[npm registry](https://www.npmjs.com/). Installation is done using the
+[`npm install` command](https://docs.npmjs.com/getting-started/installing-npm-packages-locally):
 
----
-
-### STEP 3 — Start the App (choose one method)
-
-#### Method A: Double-click START.bat (Windows — Easiest!)
-- In your file explorer, double-click **`START.bat`**
-- A terminal window opens and starts the server
-
-#### Method B: VS Code Terminal
-1. Press **Ctrl + ` ** (backtick) to open the terminal
-2. Type these commands:
-```bash
-cd backend
-npm install
-node server.js
+```sh
+$ npm install accepts
 ```
 
-#### Method C: VS Code Task (Ctrl+Shift+B)
-- Press **Ctrl+Shift+B** in VS Code
-- Select **"🏋️ Start GymPro"**
+## API
 
----
-
-### STEP 4 — Open the App
-Once you see this in the terminal:
-```
-╔══════════════════════════════════════════════╗
-║       🏋️  GYMPRO MANAGEMENT SYSTEM v2       ║
-╚══════════════════════════════════════════════╝
-```
-Open your browser and go to: **http://localhost:3000**
-
----
-
-## 🔑 Test Login Accounts
-
-| Role    | Email                 | Password    |
-|---------|-----------------------|-------------|
-| 👑 Admin   | admin@gympro.com   | admin123    |
-| 💪 Trainer | trainer@gympro.com | trainer123  |
-| 🏃 Member  | member@gympro.com  | member123   |
-
----
-
-## 📁 Project Structure
-
-```
-gym-management-system/
-├── START.bat              ← Double-click to run (Windows)
-├── START.sh               ← Run on Mac/Linux
-├── README.md
-├── .vscode/
-│   ├── tasks.json         ← Ctrl+Shift+B to launch
-│   └── launch.json        ← F5 to debug
-├── backend/
-│   ├── server.js          ← Main server (all routes)
-│   ├── package.json
-│   ├── .env               ← Config (port, JWT secret)
-│   └── data/
-│       └── db.json        ← 💾 Auto-created data file
-└── frontend/
-    └── public/
-        └── index.html     ← Complete single-page app
+```js
+var accepts = require('accepts')
 ```
 
----
+### accepts(req)
 
-## 💾 Data Persistence
+Create a new `Accepts` object for the given `req`.
 
-All data is saved automatically to `backend/data/db.json`.
-- Members you add → saved ✅
-- Payments recorded → saved ✅
-- Sessions booked → saved ✅
-- **Data survives server restarts!**
+#### .charset(charsets)
 
----
+Return the first accepted charset. If nothing in `charsets` is accepted,
+then `false` is returned.
 
-## 🔐 Forgot Password Flow
+#### .charsets()
 
-1. Click **"Forgot password?"** on the login page
-2. Enter your email and click "Send Reset Token"
-3. Look at the **server terminal** — a reset token appears:
-   ```
-   🔑 PASSWORD RESET TOKEN for user@email.com: ABC123XY
-   ```
-4. Enter that token + your new password in the reset form
-5. Log in with your new password
+Return the charsets that the request accepts, in the order of the client's
+preference (most preferred first).
 
----
+#### .encoding(encodings)
 
-## 🤖 3D Virtual Trainer
+Return the first accepted encoding. If nothing in `encodings` is accepted,
+then `false` is returned.
 
-- Click **"3D Trainer"** in the sidebar
-- Choose an exercise (Squat, Push-Up, Curl, Lunge, Plank, Jumping Jacks)
-- Click **▶ Start** to begin the animated session
-- Adjust speed with the slider
-- Track reps, sets, and calories burned
+#### .encodings()
 
----
+Return the encodings that the request accepts, in the order of the client's
+preference (most preferred first).
 
-## 👑 Admin Features
+#### .language(languages)
 
-- **Dashboard** — Live stats, revenue chart, recent activity
-- **Members** — Add, edit, remove members; filter by status
-- **Trainers** — Add/remove personal trainers
-- **Sessions** — Book and manage training sessions
-- **Attendance** — Manual check-in/check-out
-- **Payments** — Record and track revenue
-- **Plans** — View membership tiers
-- **Equipment** — Inventory management
+Return the first accepted language. If nothing in `languages` is accepted,
+then `false` is returned.
 
----
+#### .languages()
 
-## 🔧 Troubleshooting
+Return the languages that the request accepts, in the order of the client's
+preference (most preferred first).
 
-**"npm is not recognized"**
-→ Install Node.js from https://nodejs.org (LTS version), then restart VS Code
+#### .type(types)
 
-**"Port 3000 already in use"**
-→ Open `backend/.env` and change `PORT=3000` to `PORT=3001`, then restart
+Return the first accepted type (and it is returned as the same text as what
+appears in the `types` array). If nothing in `types` is accepted, then `false`
+is returned.
 
-**"Cannot find module 'express'"**
-→ Run `cd backend && npm install` in the terminal first
+The `types` array can contain full MIME types or file extensions. Any value
+that is not a full MIME types is passed to `require('mime-types').lookup`.
 
-**"Login not working"**
-→ Make sure the server terminal shows "Server running". Check http://localhost:3000/health
+#### .types()
 
-**Data not saving?**
-→ Check that `backend/data/db.json` exists. The server creates it automatically on first run.
+Return the types that the request accepts, in the order of the client's
+preference (most preferred first).
 
----
+## Examples
 
-## 🚀 Dev Mode (auto-restart on file changes)
+### Simple type negotiation
 
-```bash
-cd backend
-npm install
-npx nodemon server.js
+This simple example shows how to use `accepts` to return a different typed
+respond body based on what the client wants to accept. The server lists it's
+preferences in order and will get back the best match between the client and
+server.
+
+```js
+var accepts = require('accepts')
+var http = require('http')
+
+function app (req, res) {
+  var accept = accepts(req)
+
+  // the order of this list is significant; should be server preferred order
+  switch (accept.type(['json', 'html'])) {
+    case 'json':
+      res.setHeader('Content-Type', 'application/json')
+      res.write('{"hello":"world!"}')
+      break
+    case 'html':
+      res.setHeader('Content-Type', 'text/html')
+      res.write('<b>hello, world!</b>')
+      break
+    default:
+      // the fallback is text/plain, so no need to specify it above
+      res.setHeader('Content-Type', 'text/plain')
+      res.write('hello, world!')
+      break
+  }
+
+  res.end()
+}
+
+http.createServer(app).listen(3000)
 ```
 
-Or press **Ctrl+Shift+B** → **"🔄 Dev Mode (auto-restart)"**
+You can test this out with the cURL program:
+```sh
+curl -I -H'Accept: text/html' http://localhost:3000/
+```
+
+## License
+
+[MIT](LICENSE)
+
+[coveralls-image]: https://badgen.net/coveralls/c/github/jshttp/accepts/master
+[coveralls-url]: https://coveralls.io/r/jshttp/accepts?branch=master
+[github-actions-ci-image]: https://badgen.net/github/checks/jshttp/accepts/master?label=ci
+[github-actions-ci-url]: https://github.com/jshttp/accepts/actions/workflows/ci.yml
+[node-version-image]: https://badgen.net/npm/node/accepts
+[node-version-url]: https://nodejs.org/en/download
+[npm-downloads-image]: https://badgen.net/npm/dm/accepts
+[npm-url]: https://npmjs.org/package/accepts
+[npm-version-image]: https://badgen.net/npm/v/accepts
