@@ -34,7 +34,6 @@ const db = require("./db");
 const app = express();
 const PORT = process.env.PORT || 10000;
 const JWT_SECRET = process.env.JWT_SECRET || "gympro-secret-2024";
-const FRONTEND_DIR = path.join(__dirname, "..", "frontend", "public");
 
 app.use(
   cors({
@@ -50,7 +49,6 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(FRONTEND_DIR));
 
 app.use((req, res, next) => {
   if (req.path.startsWith("/api")) {
@@ -674,7 +672,7 @@ app.get("/health", (req, res) => {
 });
 
 app.get("*", (req, res) => {
-  res.sendFile(path.join(FRONTEND_DIR, "index.html"));
+  res.status(404).json({ error: "Not found" });
 });
 
 (async () => {
