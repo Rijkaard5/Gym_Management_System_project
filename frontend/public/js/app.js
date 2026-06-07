@@ -1,4 +1,4 @@
-const API = "http://localhost:3000/api";
+const API = "/api";
 let token = localStorage.getItem("gympro_token");
 let currentUser = JSON.parse(localStorage.getItem("gympro_user") || "null");
 let allMembers = [],
