@@ -7,23 +7,60 @@ const DATABASE_URL =
   process.env.PG_CONNECTION ||
   "postgres://postgres:postgres@localhost:5432/gympro";
 
-const pool = new Pool({
-  connectionString: DATABASE_URL,
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-});
+let pool = null;
+let useJSON = false;
+let jsonDB = null;
 
 const DATA_FILE = path.join(__dirname, "data", "db.json");
 
+function loadJSON() {
+  try {
+    if (fs.existsSync(DATA_FILE)) {
+      const data = fs.readFileSync(DATA_FILE, "utf8");
+      jsonDB = JSON.parse(data);
+      useJSON = true;
+      return true;
+    }
+  } catch (e) {
+    console.warn("Could not load JSON database:", e.message);
+  }
+  return false;
+}
+
 async function query(text, params = []) {
+  if (useJSON) {
+    // Return mock result for JSON mode
+    return { rows: [], rowCount: 0 };
+  }
   const result = await pool.query(text, params);
   return result;
 }
 
 async function init() {
-  await createSchema();
-  await seedData();
+  // Try PostgreSQL first
+  try {
+    pool = new Pool({
+      connectionString: DATABASE_URL,
+      max: 20,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 2000,
+    });
+    await createSchema();
+    await seedData();
+    console.log("✅ Using PostgreSQL database");
+  } catch (error) {
+    console.warn(
+      "PostgreSQL not available, falling back to JSON:",
+      error.message,
+    );
+    if (loadJSON()) {
+      console.log("✅ Using JSON database from backend/data/db.json");
+    } else {
+      throw new Error(
+        "Could not initialize database (neither PostgreSQL nor JSON)",
+      );
+    }
+  }
 }
 
 async function createSchema() {
@@ -318,6 +355,23 @@ async function seedData() {
 }
 
 async function getUserByEmail(email) {
+  if (useJSON) {
+    const user = jsonDB.users.find(
+      (u) => u.email.toLowerCase() === email.toLowerCase(),
+    );
+    return user
+      ? {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          password: user.password,
+          role: user.role,
+          phone: user.phone,
+          isActive: user.isActive !== false,
+          createdAt: user.createdAt,
+        }
+      : null;
+  }
   const result = await query(
     `SELECT id, name, email, password, role, phone, is_active as "isActive", created_at as "createdAt"
      FROM users
@@ -442,6 +496,22 @@ async function createMemberForExistingUser({
 }
 
 async function getMembers() {
+  if (useJSON) {
+    return (jsonDB.members || []).map((m) => ({
+      id: m.id,
+      userId: m.userId,
+      name: m.name || "Unknown",
+      email: m.email || "",
+      phone: m.phone || "",
+      planName: m.planName,
+      planId: m.planId,
+      joinDate: m.joinDate,
+      expiryDate: m.expiryDate,
+      status: m.status,
+      healthNotes: m.healthNotes,
+      emergencyContact: m.emergencyContact,
+    }));
+  }
   const result = await query(`
     SELECT m.id,
            m.user_id as "userId",
@@ -541,6 +611,20 @@ async function deleteMember(id) {
 }
 
 async function getTrainers() {
+  if (useJSON) {
+    return (jsonDB.trainers || []).map((t) => ({
+      id: t.id,
+      userId: t.userId,
+      name: t.name || "Unknown",
+      email: t.email || "",
+      phone: t.phone || "",
+      speciality: t.speciality,
+      experienceYears: t.experienceYears || 0,
+      certification: t.certification,
+      hourlyRate: t.hourlyRate || 0,
+      bio: t.bio,
+    }));
+  }
   const result = await query(`
     SELECT t.id,
            t.user_id as "userId",
@@ -616,6 +700,17 @@ async function deleteTrainer(id) {
 }
 
 async function getPlans() {
+  if (useJSON) {
+    return (jsonDB.membershipPlans || []).map((p) => ({
+      id: p.id,
+      name: p.name,
+      type: p.type,
+      price: p.price,
+      durationDays: p.durationDays,
+      features: p.features || [],
+      isActive: p.isActive !== false,
+    }));
+  }
   const result = await query(`
     SELECT id, name, type, price, duration_days as "durationDays", features, is_active as "isActive"
     FROM membership_plans
@@ -625,6 +720,19 @@ async function getPlans() {
 }
 
 async function getSessions() {
+  if (useJSON) {
+    return (jsonDB.sessions || []).map((s) => ({
+      id: s.id,
+      memberId: s.memberId,
+      trainerId: s.trainerId,
+      date: s.date,
+      startTime: s.startTime,
+      endTime: s.endTime,
+      status: s.status,
+      notes: s.notes,
+      createdAt: s.createdAt,
+    }));
+  }
   const result = await query(`
     SELECT id, member_id as "memberId", trainer_id as "trainerId", date, start_time as "startTime", end_time as "endTime",
            status, notes, created_at as "createdAt"
@@ -667,6 +775,15 @@ async function deleteSession(id) {
 }
 
 async function getAttendance() {
+  if (useJSON) {
+    return (jsonDB.attendance || []).map((a) => ({
+      id: a.id,
+      memberId: a.memberId,
+      checkIn: a.checkIn,
+      checkOut: a.checkOut,
+      method: a.method,
+    }));
+  }
   const result = await query(`
     SELECT id, member_id as "memberId", check_in as "checkIn", check_out as "checkOut", method
     FROM attendance
@@ -708,6 +825,18 @@ async function checkOut(memberId) {
 }
 
 async function getPayments() {
+  if (useJSON) {
+    return (jsonDB.payments || []).map((p) => ({
+      id: p.id,
+      memberId: p.memberId,
+      amount: p.amount,
+      paymentDate: p.paymentDate,
+      paymentMethod: p.paymentMethod,
+      status: p.status,
+      planName: p.planName,
+      receiptNumber: p.receiptNumber,
+    }));
+  }
   const result = await query(`
     SELECT id, member_id as "memberId", amount, payment_date as "paymentDate", payment_method as "paymentMethod",
            status, plan_name as "planName", receipt_number as "receiptNumber"
@@ -734,6 +863,18 @@ async function createPayment({ memberId, amount, planName, paymentMethod }) {
 }
 
 async function getEquipment() {
+  if (useJSON) {
+    return (jsonDB.equipment || []).map((e) => ({
+      id: e.id,
+      name: e.name,
+      type: e.type,
+      brand: e.brand,
+      quantity: e.quantity,
+      conditionStatus: e.conditionStatus,
+      lastMaintenance: e.lastMaintenance,
+      nextMaintenance: e.nextMaintenance,
+    }));
+  }
   const result = await query(`
     SELECT id, name, type, brand, quantity, condition_status as "conditionStatus",
            last_maintenance as "lastMaintenance", next_maintenance as "nextMaintenance"
@@ -841,6 +982,86 @@ async function deletePasswordResets(userId) {
 }
 
 async function getDashboardReport() {
+  if (useJSON) {
+    const today = new Date();
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    const members = jsonDB.members || [];
+    const trainers = jsonDB.trainers || [];
+    const attendance = jsonDB.attendance || [];
+    const payments = jsonDB.payments || [];
+    const sessions = jsonDB.sessions || [];
+    const equipment = jsonDB.equipment || [];
+
+    const activeMembers = members.filter((m) => m.status === "active").length;
+    const todayAttendance = attendance.filter((a) => {
+      const d = new Date(a.checkIn);
+      return d.toDateString() === today.toDateString();
+    }).length;
+
+    const monthlyRevenue = payments
+      .filter((p) => {
+        const d = new Date(p.paymentDate);
+        return d >= startOfMonth && p.status === "completed";
+      })
+      .reduce((sum, p) => sum + (p.amount || 0), 0);
+
+    const totalRevenue = payments
+      .filter((p) => p.status === "completed")
+      .reduce((sum, p) => sum + (p.amount || 0), 0);
+
+    const activeSessions = sessions.filter((s) =>
+      ["scheduled", "confirmed"].includes(s.status),
+    ).length;
+
+    const expiringMembers = members.filter((m) => {
+      const expiry = new Date(m.expiryDate);
+      const inSevenDays = new Date();
+      inSevenDays.setDate(inSevenDays.getDate() + 7);
+      return expiry <= inSevenDays && expiry >= today && m.status === "active";
+    }).length;
+
+    const recentMembers = members.slice(-5).map((m) => ({
+      id: m.id,
+      userId: m.userId,
+      name: m.name || "Unknown",
+      email: m.email || "",
+      planName: m.planName,
+      status: m.status,
+    }));
+
+    const revenueByMonth = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date();
+      d.setMonth(d.getMonth() - i);
+      const label = d.toLocaleString("default", { month: "short" });
+      const monthRevenue = payments
+        .filter((p) => {
+          const pd = new Date(p.paymentDate);
+          return (
+            pd.getMonth() === d.getMonth() &&
+            pd.getFullYear() === d.getFullYear() &&
+            p.status === "completed"
+          );
+        })
+        .reduce((sum, p) => sum + (p.amount || 0), 0);
+      revenueByMonth.push({ month: label, revenue: monthRevenue });
+    }
+
+    return {
+      totalMembers: activeMembers,
+      totalTrainers: trainers.length,
+      todayAttendance,
+      monthlyRevenue,
+      totalRevenue,
+      activeSessions,
+      expiringMemberships: expiringMembers,
+      totalEquipment: equipment.length,
+      recentMembers,
+      revenueByMonth,
+    };
+  }
+
   const today = new Date();
   const startOfMonth = new Date(
     today.getFullYear(),

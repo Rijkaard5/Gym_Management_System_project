@@ -189,17 +189,18 @@ function initApp() {
 }
 
 // ============================================================
-// NAVIGATION
+// NAVIGATION - DYNAMIC PAGE LOADING
 // ============================================================
-function navigate(page) {
+async function navigate(page) {
+  // Hide all pages
   document
     .querySelectorAll(".page")
     .forEach((p) => p.classList.remove("active"));
   document
     .querySelectorAll(".nav-item")
     .forEach((n) => n.classList.remove("active"));
-  const pageEl = document.getElementById(`page-${page}`);
-  if (pageEl) pageEl.classList.add("active");
+
+  // Mark nav item as active
   document.querySelectorAll(".nav-item").forEach((n) => {
     if (
       n.getAttribute("onclick") &&
@@ -208,6 +209,28 @@ function navigate(page) {
       n.classList.add("active");
   });
 
+  let pageEl = document.getElementById(`page-${page}`);
+
+  // Load page dynamically if not already in DOM
+  if (!pageEl) {
+    try {
+      const response = await fetch(`pages/${page}.html`);
+      if (!response.ok) throw new Error(`Failed to load page: ${page}`);
+      const html = await response.text();
+      const container = document.getElementById("pages-container");
+      container.innerHTML = html;
+      pageEl = document.getElementById(`page-${page}`);
+    } catch (e) {
+      console.error(`Error loading page ${page}:`, e);
+      toast(`Error loading page: ${page}`, "error");
+      return;
+    }
+  }
+
+  // Show page
+  if (pageEl) pageEl.classList.add("active");
+
+  // Execute page loader function
   const loaders = {
     dashboard: loadDashboard,
     members: loadMembers,

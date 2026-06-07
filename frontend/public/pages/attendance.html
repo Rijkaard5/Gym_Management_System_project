@@ -1,0 +1,31 @@
+<!-- ===== ATTENDANCE PAGE ===== -->
+<div class="page" id="page-attendance">
+  <div
+    class="page-header flex justify-between items-center"
+    style="display: flex !important"
+  >
+    <div>
+      <h1>Attendance</h1>
+      <p>Member check-ins today</p>
+    </div>
+    <button class="btn btn-primary" onclick="openModal('checkin')">
+      + Check In
+    </button>
+  </div>
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Member ID</th>
+            <th>Check In</th>
+            <th>Check Out</th>
+            <th>Duration</th>
+            <th>Method</th>
+          </tr>
+        </thead>
+        <tbody id="attendance-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>

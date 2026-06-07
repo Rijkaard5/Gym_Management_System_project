@@ -1,0 +1,33 @@
+<!-- ===== SESSIONS PAGE ===== -->
+<div class="page" id="page-sessions">
+  <div
+    class="page-header flex justify-between items-center"
+    style="display: flex !important"
+  >
+    <div>
+      <h1>Sessions</h1>
+      <p>Training sessions schedule</p>
+    </div>
+    <button class="btn btn-primary" onclick="openModal('add-session')">
+      + Book Session
+    </button>
+  </div>
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Member</th>
+            <th>Trainer</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="sessions-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>

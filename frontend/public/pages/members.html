@@ -1,0 +1,51 @@
+<!-- ===== MEMBERS PAGE ===== -->
+<div class="page" id="page-members">
+  <div
+    class="page-header flex justify-between items-center"
+    style="display: flex !important"
+  >
+    <div>
+      <h1>Members</h1>
+      <p>Manage gym members</p>
+    </div>
+    <button class="btn btn-primary" onclick="openModal('add-member')">
+      + Add Member
+    </button>
+  </div>
+  <div class="card">
+    <div class="flex gap-3 mb-4">
+      <input
+        class="form-control"
+        style="max-width: 280px"
+        id="member-search"
+        placeholder="Search members..."
+        oninput="filterMembers(this.value)"
+      />
+      <select
+        class="form-control"
+        style="max-width: 160px"
+        onchange="filterMembersByStatus(this.value)"
+      >
+        <option value="">All Status</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+        <option value="frozen">Frozen</option>
+      </select>
+    </div>
+    <div class="table-wrap">
+      <table id="members-table">
+        <thead>
+          <tr>
+            <th>Member</th>
+            <th>Plan</th>
+            <th>Join Date</th>
+            <th>Expiry</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="members-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>

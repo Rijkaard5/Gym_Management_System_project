@@ -1,0 +1,39 @@
+<!-- ===== DASHBOARD PAGE ===== -->
+<div class="page active" id="page-dashboard">
+  <div class="page-header">
+    <h1>Dashboard</h1>
+    <p id="dashboard-greeting">Welcome back!</p>
+  </div>
+  <div class="grid grid-cols-4 gap-4 mb-6" id="stat-cards"></div>
+  <div class="grid grid-cols-2 gap-4 mb-6">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title"> Revenue — Last 6 Months</span>
+      </div>
+      <div class="chart-container" id="revenue-chart"></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">👥 Recent Members</span>
+        <button class="btn btn-sm btn-secondary" onclick="navigate('members')">
+          View All
+        </button>
+      </div>
+      <div id="recent-members-list"></div>
+    </div>
+  </div>
+  <div class="grid grid-cols-2 gap-4">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title"> Equipment Status</span>
+      </div>
+      <div id="equipment-status-list"></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title"> Upcoming Sessions</span>
+      </div>
+      <div id="upcoming-sessions-list"></div>
+    </div>
+  </div>
+</div>

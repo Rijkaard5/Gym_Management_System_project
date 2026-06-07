@@ -1,0 +1,326 @@
+<!-- ============================================================
+     MODALS
+     ============================================================ -->
+<div
+  class="modal-overlay hidden"
+  id="modal-overlay"
+  onclick="closeModal(event)"
+>
+  <!-- ADD MEMBER -->
+  <div class="modal hidden" id="modal-add-member">
+    <div class="modal-header">
+      <h3>Add New Member</h3>
+      <button class="btn-icon" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Full Name *</label
+        ><input class="form-control" id="m-name" placeholder="John Doe" />
+      </div>
+      <div class="form-group">
+        <label>Email *</label
+        ><input
+          class="form-control"
+          id="m-email"
+          type="email"
+          placeholder="john@email.com"
+        />
+      </div>
+      <div class="form-group">
+        <label>Phone</label
+        ><input class="form-control" id="m-phone" placeholder="+1 234 567" />
+      </div>
+      <div class="form-group">
+        <label>Password *</label
+        ><input
+          class="form-control"
+          id="m-password"
+          type="password"
+          placeholder="Min 6 characters"
+        />
+      </div>
+      <div class="form-group">
+        <label>Membership Plan</label>
+        <select class="form-control" id="m-plan">
+          <option value="1">Basic Monthly — $29.99</option>
+          <option value="2">Premium Monthly — $49.99</option>
+          <option value="3">Quarterly Plan — $79.99</option>
+          <option value="4">Annual Premium — $499.99</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Emergency Contact</label
+        ><input
+          class="form-control"
+          id="m-emergency"
+          placeholder="Name & phone"
+        />
+      </div>
+      <div class="form-group">
+        <label>Health Notes</label
+        ><textarea
+          class="form-control"
+          id="m-health"
+          rows="2"
+          placeholder="Any medical notes..."
+        ></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="addMember()">Add Member</button>
+    </div>
+  </div>
+
+  <!-- ADD TRAINER -->
+  <div class="modal hidden" id="modal-add-trainer">
+    <div class="modal-header">
+      <h3>Add New Trainer</h3>
+      <button class="btn-icon" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Full Name *</label
+        ><input class="form-control" id="t-name" placeholder="Jane Smith" />
+      </div>
+      <div class="form-group">
+        <label>Email *</label
+        ><input
+          class="form-control"
+          id="t-email"
+          type="email"
+          placeholder="jane@email.com"
+        />
+      </div>
+      <div class="form-group">
+        <label>Phone</label
+        ><input class="form-control" id="t-phone" placeholder="+1 234 567" />
+      </div>
+      <div class="form-group">
+        <label>Password *</label
+        ><input class="form-control" id="t-password" type="password" />
+      </div>
+      <div class="form-group">
+        <label>Speciality</label
+        ><input
+          class="form-control"
+          id="t-spec"
+          placeholder="Strength Training, Yoga..."
+        />
+      </div>
+      <div class="form-group">
+        <label>Years Experience</label
+        ><input class="form-control" id="t-exp" type="number" placeholder="5" />
+      </div>
+      <div class="form-group">
+        <label>Certification</label
+        ><input
+          class="form-control"
+          id="t-cert"
+          placeholder="NASM-CPT, ACE..."
+        />
+      </div>
+      <div class="form-group">
+        <label>Hourly Rate ($)</label
+        ><input
+          class="form-control"
+          id="t-rate"
+          type="number"
+          placeholder="50"
+        />
+      </div>
+      <div class="form-group">
+        <label>Bio</label
+        ><textarea class="form-control" id="t-bio" rows="2"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="addTrainer()">
+        Add Trainer
+      </button>
+    </div>
+  </div>
+
+  <!-- ADD SESSION -->
+  <div class="modal hidden" id="modal-add-session">
+    <div class="modal-header">
+      <h3>Book Session</h3>
+      <button class="btn-icon" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Member ID</label
+        ><input
+          class="form-control"
+          id="s-member"
+          type="number"
+          placeholder="Member ID"
+        />
+      </div>
+      <div class="form-group">
+        <label>Trainer ID</label
+        ><input
+          class="form-control"
+          id="s-trainer"
+          type="number"
+          placeholder="Trainer ID"
+        />
+      </div>
+      <div class="form-group">
+        <label>Date</label
+        ><input class="form-control" id="s-date" type="date" />
+      </div>
+      <div class="form-group">
+        <label>Start Time</label
+        ><input class="form-control" id="s-time" type="time" />
+      </div>
+      <div class="form-group">
+        <label>End Time</label
+        ><input class="form-control" id="s-endtime" type="time" />
+      </div>
+      <div class="form-group">
+        <label>Notes</label
+        ><textarea class="form-control" id="s-notes" rows="2"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="addSession()">
+        Book Session
+      </button>
+    </div>
+  </div>
+
+  <!-- CHECK IN -->
+  <div class="modal hidden" id="modal-checkin">
+    <div class="modal-header">
+      <h3>Member Check In</h3>
+      <button class="btn-icon" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Member ID</label
+        ><input
+          class="form-control"
+          id="ci-member"
+          type="number"
+          placeholder="Enter member ID"
+        />
+      </div>
+      <div class="form-group">
+        <label>Method</label>
+        <select class="form-control" id="ci-method">
+          <option value="manual">Manual</option>
+          <option value="card">Card</option>
+          <option value="fingerprint">Fingerprint</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="checkIn()">Check In</button>
+    </div>
+  </div>
+
+  <!-- ADD PAYMENT -->
+  <div class="modal hidden" id="modal-add-payment">
+    <div class="modal-header">
+      <h3>Record Payment</h3>
+      <button class="btn-icon" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Member ID</label
+        ><input
+          class="form-control"
+          id="p-member"
+          type="number"
+          placeholder="Member ID"
+        />
+      </div>
+      <div class="form-group">
+        <label>Amount ($)</label
+        ><input
+          class="form-control"
+          id="p-amount"
+          type="number"
+          step="0.01"
+          placeholder="49.99"
+        />
+      </div>
+      <div class="form-group">
+        <label>Plan</label
+        ><input
+          class="form-control"
+          id="p-plan"
+          placeholder="Premium Monthly"
+        />
+      </div>
+      <div class="form-group">
+        <label>Method</label>
+        <select class="form-control" id="p-method">
+          <option value="cash">Cash</option>
+          <option value="credit_card">Credit Card</option>
+          <option value="debit_card">Debit Card</option>
+          <option value="online">Online</option>
+          <option value="bank_transfer">Bank Transfer</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="addPayment()">Record</button>
+    </div>
+  </div>
+
+  <!-- ADD EQUIPMENT -->
+  <div class="modal hidden" id="modal-add-equipment">
+    <div class="modal-header">
+      <h3>Add Equipment</h3>
+      <button class="btn-icon" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Name *</label
+        ><input class="form-control" id="eq-name" placeholder="Treadmill" />
+      </div>
+      <div class="form-group">
+        <label>Type</label
+        ><input
+          class="form-control"
+          id="eq-type"
+          placeholder="Cardio, Strength..."
+        />
+      </div>
+      <div class="form-group">
+        <label>Brand</label
+        ><input class="form-control" id="eq-brand" placeholder="LifeFitness" />
+      </div>
+      <div class="form-group">
+        <label>Quantity</label
+        ><input class="form-control" id="eq-qty" type="number" value="1" />
+      </div>
+      <div class="form-group">
+        <label>Condition</label>
+        <select class="form-control" id="eq-condition">
+          <option value="excellent">Excellent</option>
+          <option value="good">Good</option>
+          <option value="fair">Fair</option>
+          <option value="poor">Poor</option>
+          <option value="out_of_order">Out of Order</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Next Maintenance Date</label
+        ><input class="form-control" id="eq-maint" type="date" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="addEquipment()">
+        Add Equipment
+      </button>
+    </div>
+  </div>
+</div>

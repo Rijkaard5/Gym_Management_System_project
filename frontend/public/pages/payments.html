@@ -1,0 +1,56 @@
+<!-- ===== PAYMENTS PAGE ===== -->
+<div class="page" id="page-payments">
+  <div
+    class="page-header flex justify-between items-center"
+    style="display: flex !important"
+  >
+    <div>
+      <h1>Payments</h1>
+      <p>Revenue & transaction history</p>
+    </div>
+    <button class="btn btn-primary" onclick="openModal('add-payment')">
+      + Record Payment
+    </button>
+  </div>
+  <div class="grid grid-cols-3 gap-4 mb-6">
+    <div class="stat-card">
+      <div class="stat-icon" style="background: rgba(34, 197, 94, 0.15)">
+        💰
+      </div>
+      <div class="stat-value text-green" id="total-rev">$0</div>
+      <div class="stat-label">Total Revenue</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background: rgba(59, 130, 246, 0.15)">
+        📅
+      </div>
+      <div class="stat-value text-blue" id="month-rev">$0</div>
+      <div class="stat-label">This Month</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background: rgba(168, 85, 247, 0.15)">
+        🧾
+      </div>
+      <div class="stat-value" id="total-txn">0</div>
+      <div class="stat-label">Transactions</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Receipt</th>
+            <th>Member</th>
+            <th>Plan</th>
+            <th>Amount</th>
+            <th>Method</th>
+            <th>Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="payments-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>

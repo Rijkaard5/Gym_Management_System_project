@@ -1,0 +1,47 @@
+<!-- ===== PROFILE PAGE ===== -->
+<div class="page" id="page-profile">
+  <div class="page-header"><h1>Profile Settings</h1></div>
+  <div class="grid grid-cols-2 gap-4">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">👤 Account Info</span>
+      </div>
+      <div id="profile-info"></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">🔒 Change Password</span>
+      </div>
+      <div class="form-group">
+        <label>Current Password</label>
+        <input
+          class="form-control"
+          id="cp-current"
+          type="password"
+          placeholder="Current password"
+        />
+      </div>
+      <div class="form-group">
+        <label>New Password</label>
+        <input
+          class="form-control"
+          id="cp-new"
+          type="password"
+          placeholder="New password"
+        />
+      </div>
+      <div class="form-group">
+        <label>Confirm New Password</label>
+        <input
+          class="form-control"
+          id="cp-confirm"
+          type="password"
+          placeholder="Confirm new password"
+        />
+      </div>
+      <button class="btn btn-primary" onclick="changePassword()">
+        Update Password
+      </button>
+    </div>
+  </div>
+</div>
