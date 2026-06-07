@@ -1,0 +1,25 @@
+# Normalize line endings for all text files
+* text=auto
+
+# Ensure shell scripts stay LF even on Windows
+data/*.sh text eol=lf
+*.sh text eol=lf
+
+# Ensure batch files stay CRLF on Windows
+*.bat text eol=crlf
+
+# Force JSON, JS, HTML, CSS, Markdown to LF normalization in repo
+type=text eol=lf
+*.json text eol=lf
+*.js text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.md text eol=lf
+
+# Keep binary files untouched
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary

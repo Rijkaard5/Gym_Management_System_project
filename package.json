@@ -1,0 +1,13 @@
+{
+  "name": "gym-management-system",
+  "version": "2.0.0",
+  "description": "GymPro - Complete Gym Management System",
+  "scripts": {
+    "start": "cd backend && node server.js",
+    "dev": "cd backend && npx nodemon server.js",
+    "install": "cd backend && npm install",
+    "setup": "cd backend && npm install && node server.js"
+  },
+  "author": "GymPro Team",
+  "license": "ISC"
+}
