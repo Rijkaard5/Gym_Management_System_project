@@ -242,6 +242,7 @@ async function navigate(page) {
     equipment: loadEquipment,
     "my-membership": loadMyMembership,
     profile: loadProfile,
+    trainer3d: initTrainer3D,
   };
   if (loaders[page]) loaders[page]();
 }
