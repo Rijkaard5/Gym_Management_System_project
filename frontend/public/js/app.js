@@ -178,14 +178,7 @@ function initApp() {
     .querySelectorAll(".member-only")
     .forEach((el) => el.classList.toggle("hidden", !isMember));
 
-  const hour = new Date().getHours();
-  const greeting =
-    hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
-  document.getElementById("dashboard-greeting").textContent =
-    `${greeting}, ${currentUser.name}! Here's your overview.`;
-
   navigate("dashboard");
-  initTrainer3D();
 }
 
 // ============================================================
@@ -255,6 +248,12 @@ function toggleSidebar() {
 // DASHBOARD
 // ============================================================
 async function loadDashboard() {
+  const hour = new Date().getHours();
+  const greeting =
+    hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  document.getElementById("dashboard-greeting").textContent =
+    `${greeting}, ${currentUser.name}! Here's your overview.`;
+
   try {
     const { data } = await api("GET", "/reports/dashboard");
     const cards = [
