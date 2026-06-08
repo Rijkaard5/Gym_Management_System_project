@@ -260,6 +260,12 @@ body {
   border-color: var(--accent);
 }
 
+.icon {
+  display: inline-block;
+  vertical-align: -0.125em;
+  flex-shrink: 0;
+}
+
 /* ============================================================
    FORMS
    ============================================================ */

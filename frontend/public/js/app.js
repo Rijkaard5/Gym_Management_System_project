@@ -7,10 +7,75 @@ let allMembers = [],
   allEquipment = [];
 
 // ============================================================
+// ICONS (inline SVG, replaces emoji glyphs)
+// ============================================================
+const ICONS = {
+  dumbbell: '<path d="M6 5v14M18 5v14M3 9v6M21 9v6M6 12h12"/>',
+  grid: '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>',
+  users:
+    '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  "user-check":
+    '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/>',
+  calendar:
+    '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+  "check-square":
+    '<polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
+  "check-circle":
+    '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+  "dollar-sign":
+    '<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
+  "credit-card":
+    '<rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>',
+  award:
+    '<circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>',
+  monitor:
+    '<rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',
+  "log-out":
+    '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>',
+  settings:
+    '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  "trending-up":
+    '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>',
+  "alert-triangle":
+    '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  mail: '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/>',
+  lock: '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  menu: '<line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>',
+  search:
+    '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+  x: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+  edit: '<path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>',
+  trash:
+    '<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+  activity: '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
+  play: '<polygon points="5 3 19 12 5 21 5 3"/>',
+  pause: '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>',
+  "rotate-ccw":
+    '<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>',
+  target:
+    '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+  shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  check: '<polyline points="20 6 9 17 4 12"/>',
+};
+
+function icon(name, size = 18) {
+  const inner = ICONS[name];
+  if (!inner) return "";
+  return `<svg class="icon" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>`;
+}
+
+// ============================================================
 // TOAST
 // ============================================================
 function toast(msg, type = "info") {
-  const icons = { success: "", error: "", warning: "", info: "ℹ" };
+  const icons = {
+    success: icon("check-circle", 16),
+    error: icon("x", 16),
+    warning: icon("alert-triangle", 16),
+    info: icon("activity", 16),
+  };
   const t = document.createElement("div");
   t.className = `toast toast-${type}`;
   t.innerHTML = `<span>${icons[type]}</span><span>${msg}</span>`;
@@ -258,56 +323,56 @@ async function loadDashboard() {
     const { data } = await api("GET", "/reports/dashboard");
     const cards = [
       {
-        icon: "",
+        icon: icon("users", 22),
         label: "Active Members",
         value: data.totalMembers,
         color: "#3b82f6",
         change: "+3 this week",
       },
       {
-        icon: "",
+        icon: icon("user-check", 22),
         label: "Trainers",
         value: data.totalTrainers,
         color: "#a855f7",
         change: "On staff",
       },
       {
-        icon: "",
+        icon: icon("check-circle", 22),
         label: "Today's Check-ins",
         value: data.todayAttendance,
         color: "#22c55e",
         change: "Live count",
       },
       {
-        icon: "",
+        icon: icon("dollar-sign", 22),
         label: "Monthly Revenue",
         value: "$" + data.monthlyRevenue.toFixed(2),
         color: "#f97316",
         change: "This month",
       },
       {
-        icon: "",
+        icon: icon("calendar", 22),
         label: "Active Sessions",
         value: data.activeSessions,
         color: "#06b6d4",
         change: "Scheduled",
       },
       {
-        icon: "",
+        icon: icon("alert-triangle", 22),
         label: "Expiring Soon",
         value: data.expiringMemberships,
         color: "#eab308",
         change: "In 7 days",
       },
       {
-        icon: "",
+        icon: icon("settings", 22),
         label: "Equipment",
         value: data.totalEquipment,
         color: "#ec4899",
         change: "In inventory",
       },
       {
-        icon: "",
+        icon: icon("trending-up", 22),
         label: "Total Revenue",
         value: "$" + data.totalRevenue.toFixed(2),
         color: "#22c55e",
@@ -429,7 +494,7 @@ function renderMembersTable(data) {
   const tbody = document.getElementById("members-tbody");
   if (!data.length) {
     tbody.innerHTML =
-      '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon"></div>No members found</div></td></tr>';
+      `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">${icon("users", 36)}</div>No members found</div></td></tr>`;
     return;
   }
   tbody.innerHTML = data
@@ -451,8 +516,8 @@ function renderMembersTable(data) {
       <td><span class="badge badge-${m.status === "active" ? "green" : m.status === "frozen" ? "yellow" : "red"}">${m.status}</span></td>
       <td>
         <div class="flex gap-2">
-          <button class="btn btn-sm btn-secondary" onclick="editMember(${m.id})"></button>
-          <button class="btn btn-sm btn-danger" onclick="deleteMember(${m.id})"></button>
+          <button class="btn btn-sm btn-secondary" onclick="editMember(${m.id})">${icon("edit", 14)}</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteMember(${m.id})">${icon("trash", 14)}</button>
         </div>
       </td>
     </tr>
@@ -539,7 +604,7 @@ async function loadTrainers() {
     const grid = document.getElementById("trainers-grid");
     if (!data.length) {
       grid.innerHTML =
-        '<div class="empty-state"><div class="empty-icon"></div>No trainers found</div>';
+        `<div class="empty-state"><div class="empty-icon">${icon("user-check", 36)}</div>No trainers found</div>`;
       return;
     }
     grid.innerHTML = data
@@ -616,7 +681,7 @@ async function loadSessions() {
     const tbody = document.getElementById("sessions-tbody");
     if (!data.length) {
       tbody.innerHTML =
-        '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon"></div>No sessions booked</div></td></tr>';
+        `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">${icon("calendar", 36)}</div>No sessions booked</div></td></tr>`;
       return;
     }
     const statusColors = {
@@ -689,7 +754,7 @@ async function loadAttendance() {
     );
     if (!today.length) {
       tbody.innerHTML =
-        '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon"></div>No check-ins today</div></td></tr>';
+        `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">${icon("check-circle", 36)}</div>No check-ins today</div></td></tr>`;
       return;
     }
     tbody.innerHTML = today
@@ -748,7 +813,7 @@ async function loadPayments() {
     const tbody = document.getElementById("payments-tbody");
     if (!data.length) {
       tbody.innerHTML =
-        '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon"></div>No payments yet</div></td></tr>';
+        `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">${icon("credit-card", 36)}</div>No payments yet</div></td></tr>`;
       return;
     }
     tbody.innerHTML = [...data]
@@ -803,7 +868,12 @@ async function loadPlans() {
     const isMember = currentUser.role === "member";
     const addBtn = document.getElementById("add-plan-btn");
     if (addBtn) addBtn.classList.toggle("hidden", !isAdmin);
-    const icons = ["", "", "", ""];
+    const icons = [
+      icon("award", 32),
+      icon("star", 32),
+      icon("trending-up", 32),
+      icon("shield", 32),
+    ];
     const colors = [
       "var(--blue)",
       "var(--accent)",
@@ -818,7 +888,7 @@ async function loadPlans() {
         <div class="font-bold text-lg mb-1">${p.name}</div>
         <div style="font-size:32px;font-weight:800;color:${colors[i % 4]};margin-bottom:4px;">$${p.price}</div>
         <div class="text-sm text-muted mb-4">${p.durationDays} days / ${p.type}</div>
-        <div>${(p.features || []).map((f) => `<div class="flex items-center gap-2 text-sm mb-1"><span style="color:var(--green);"></span>${f}</div>`).join("")}</div>
+        <div>${(p.features || []).map((f) => `<div class="flex items-center gap-2 text-sm mb-1"><span style="color:var(--green);">${icon("check", 14)}</span>${f}</div>`).join("")}</div>
         ${
           isAdmin
             ? `<div class="flex gap-2 mt-4">
@@ -934,7 +1004,7 @@ async function loadEquipment() {
         <td><span class="badge badge-${condColors[e.conditionStatus] || "blue"}">${e.conditionStatus}</span></td>
         <td class="text-sm text-muted">${e.nextMaintenance || "—"}</td>
         <td>
-          <button class="btn btn-sm btn-danger" onclick="deleteEquipment(${e.id})"></button>
+          <button class="btn btn-sm btn-danger" onclick="deleteEquipment(${e.id})">${icon("trash", 14)}</button>
         </td>
       </tr>
     `,
@@ -987,14 +1057,14 @@ async function loadMyMembership() {
     const card = document.getElementById("my-membership-card");
     if (!mine) {
       card.innerHTML =
-        '<div class="empty-state"><div class="empty-icon"></div>No membership found. Contact admin.</div>';
+        `<div class="empty-state"><div class="empty-icon">${icon("award", 36)}</div>No membership found. Contact admin.</div>`;
     } else {
       const daysLeft = Math.ceil(
         (new Date(mine.expiryDate) - new Date()) / 86400000,
       );
       const progress = Math.max(0, Math.min(100, (daysLeft / 30) * 100));
       card.innerHTML = `
-        <div class="card-header"><span class="card-title">${mine.planName}</span><span class="badge badge-${mine.status === "active" ? "green" : "red"}">${mine.status}</span></div>
+        <div class="card-header"><span class="card-title">${icon("award", 36)} ${mine.planName}</span><span class="badge badge-${mine.status === "active" ? "green" : "red"}">${mine.status}</span></div>
         <div class="grid grid-cols-2 gap-3 mb-4">
           <div class="trainer-stat" style="padding:12px;"><div class="value" style="font-size:20px;">${mine.joinDate}</div><div class="label">Join Date</div></div>
           <div class="trainer-stat" style="padding:12px;"><div class="value" style="font-size:20px;${daysLeft < 7 ? "color:var(--red)" : ""}">${daysLeft}d</div><div class="label">Days Left</div></div>
@@ -1202,7 +1272,7 @@ function initTrainer3D() {
       .map(
         ([k, v]) => `
       <div class="exercise-btn ${k === currentExercise ? "active" : ""}" id="ebtn-${k}" onclick="selectExercise('${k}')">
-        <div style="font-size:18px;margin-bottom:4px;">${{ squat: "", pushup: "", curl: "", lunge: "", plank: "", jumpjack: "" }[k]}</div>
+        <div style="margin-bottom:4px;">${icon("activity", 20)}</div>
         <div>${v.name}</div>
       </div>
     `,
@@ -1230,12 +1300,12 @@ function updateMuscleTargets() {
   const el = document.getElementById("muscle-targets");
   if (!el) return;
   const ex = exercises[currentExercise];
-  el.innerHTML = `<div class="text-sm font-medium mb-2">Target Muscles</div><div>${(ex.muscle || []).map((m) => `<span class="tag">${m}</span>`).join("")}</div>`;
+  el.innerHTML = `<div class="text-sm font-medium mb-2 flex items-center gap-1">${icon("target", 14)} Target Muscles</div><div>${(ex.muscle || []).map((m) => `<span class="tag">${m}</span>`).join("")}</div>`;
 }
 
 function speak(text) {
   const el = document.getElementById("trainer-speech");
-  if (el) el.textContent = `"${text}"`;
+  if (el) el.innerHTML = `${icon("monitor", 14)} "${text}"`;
 }
 
 function startSession() {
