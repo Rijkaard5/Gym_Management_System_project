@@ -557,6 +557,30 @@ async function getMemberById(id) {
   return result.rows[0];
 }
 
+async function getMemberByUserId(userId) {
+  const result = await query(
+    `SELECT id, user_id as "userId", plan_name as "planName", plan_id as "planId",
+            join_date as "joinDate", expiry_date as "expiryDate", status,
+            health_notes as "healthNotes", emergency_contact as "emergencyContact"
+     FROM members
+     WHERE user_id = $1
+     LIMIT 1`,
+    [userId],
+  );
+  return result.rows[0];
+}
+
+async function getPlanById(id) {
+  const result = await query(
+    `SELECT id, name, type, price, duration_days as "durationDays", features, is_active as "isActive"
+     FROM membership_plans
+     WHERE id = $1
+     LIMIT 1`,
+    [id],
+  );
+  return result.rows[0];
+}
+
 async function updateMember(id, updates) {
   const fields = [];
   const values = [];
@@ -717,6 +741,49 @@ async function getPlans() {
     ORDER BY id
   `);
   return result.rows;
+}
+
+async function createPlan({ name, type, price, durationDays, features }) {
+  const result = await query(
+    `INSERT INTO membership_plans (name, type, price, duration_days, features, is_active)
+     VALUES ($1, $2, $3, $4, $5, true)
+     RETURNING id, name, type, price, duration_days as "durationDays", features, is_active as "isActive"`,
+    [name, type, price || 0, durationDays || 30, JSON.stringify(features || [])],
+  );
+  return result.rows[0];
+}
+
+async function updatePlan(id, updates) {
+  const fields = [];
+  const values = [];
+  const columns = {
+    name: "name",
+    type: "type",
+    price: "price",
+    durationDays: "duration_days",
+    features: "features",
+    isActive: "is_active",
+  };
+  for (const [key, value] of Object.entries(updates)) {
+    if (!columns[key]) continue;
+    fields.push(`${columns[key]} = $${fields.length + 1}`);
+    values.push(key === "features" ? JSON.stringify(value || []) : value);
+  }
+  if (!fields.length) return null;
+  const result = await query(
+    `UPDATE membership_plans SET ${fields.join(", ")} WHERE id = $${fields.length + 1}
+     RETURNING id, name, type, price, duration_days as "durationDays", features, is_active as "isActive"`,
+    [...values, id],
+  );
+  return result.rows[0];
+}
+
+async function deletePlan(id) {
+  const result = await query(
+    `DELETE FROM membership_plans WHERE id = $1 RETURNING id`,
+    [id],
+  );
+  return result.rows[0];
 }
 
 async function getSessions() {
@@ -1150,6 +1217,8 @@ module.exports = {
   createMemberForExistingUser,
   getMembers,
   getMemberById,
+  getMemberByUserId,
+  getPlanById,
   updateMember,
   updateUserNameAndPhone,
   deleteMember,
@@ -1157,6 +1226,9 @@ module.exports = {
   createTrainerWithUser,
   deleteTrainer,
   getPlans,
+  createPlan,
+  updatePlan,
+  deletePlan,
   getSessions,
   createSession,
   deleteSession,

@@ -10,7 +10,7 @@ let allMembers = [],
 // TOAST
 // ============================================================
 function toast(msg, type = "info") {
-  const icons = { success: "✅", error: "❌", warning: "⚠️", info: "ℹ️" };
+  const icons = { success: "", error: "", warning: "", info: "ℹ" };
   const t = document.createElement("div");
   t.className = `toast toast-${type}`;
   t.innerHTML = `<span>${icons[type]}</span><span>${msg}</span>`;
@@ -77,7 +77,7 @@ async function doLogin() {
     currentUser = data.user;
     localStorage.setItem("gympro_token", token);
     localStorage.setItem("gympro_user", JSON.stringify(currentUser));
-    toast(`Welcome back, ${data.user.name}! 🎉`, "success");
+    toast(`Welcome back, ${data.user.name}!`, "success");
     initApp();
   } catch (e) {}
 }
@@ -102,7 +102,7 @@ async function doRegister() {
     currentUser = data.user;
     localStorage.setItem("gympro_token", token);
     localStorage.setItem("gympro_user", JSON.stringify(currentUser));
-    toast(`Account created! Welcome, ${name} 🎉`, "success");
+    toast(`Account created! Welcome, ${name}`, "success");
     initApp();
   } catch (e) {}
 }
@@ -258,56 +258,56 @@ async function loadDashboard() {
     const { data } = await api("GET", "/reports/dashboard");
     const cards = [
       {
-        icon: "👥",
+        icon: "",
         label: "Active Members",
         value: data.totalMembers,
         color: "#3b82f6",
         change: "+3 this week",
       },
       {
-        icon: "💪",
+        icon: "",
         label: "Trainers",
         value: data.totalTrainers,
         color: "#a855f7",
         change: "On staff",
       },
       {
-        icon: "✅",
+        icon: "",
         label: "Today's Check-ins",
         value: data.todayAttendance,
         color: "#22c55e",
         change: "Live count",
       },
       {
-        icon: "💰",
+        icon: "",
         label: "Monthly Revenue",
         value: "$" + data.monthlyRevenue.toFixed(2),
         color: "#f97316",
         change: "This month",
       },
       {
-        icon: "📅",
+        icon: "",
         label: "Active Sessions",
         value: data.activeSessions,
         color: "#06b6d4",
         change: "Scheduled",
       },
       {
-        icon: "⚠️",
+        icon: "",
         label: "Expiring Soon",
         value: data.expiringMemberships,
         color: "#eab308",
         change: "In 7 days",
       },
       {
-        icon: "🏗️",
+        icon: "",
         label: "Equipment",
         value: data.totalEquipment,
         color: "#ec4899",
         change: "In inventory",
       },
       {
-        icon: "🧾",
+        icon: "",
         label: "Total Revenue",
         value: "$" + data.totalRevenue.toFixed(2),
         color: "#22c55e",
@@ -376,7 +376,7 @@ async function loadDashboard() {
         <span style="font-size:13px;">${e.name}</span>
         <div class="flex items-center gap-2">
           <span class="text-xs text-muted">Qty: ${e.quantity}</span>
-          <span style="font-size:11px;color:${colors[e.conditionStatus] || "var(--text2)"};">● ${e.conditionStatus}</span>
+          <span style="font-size:11px;color:${colors[e.conditionStatus] || "var(--text2)"};">${e.conditionStatus}</span>
         </div>
       </div>`;
       })
@@ -429,7 +429,7 @@ function renderMembersTable(data) {
   const tbody = document.getElementById("members-tbody");
   if (!data.length) {
     tbody.innerHTML =
-      '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">👥</div>No members found</div></td></tr>';
+      '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon"></div>No members found</div></td></tr>';
     return;
   }
   tbody.innerHTML = data
@@ -451,8 +451,8 @@ function renderMembersTable(data) {
       <td><span class="badge badge-${m.status === "active" ? "green" : m.status === "frozen" ? "yellow" : "red"}">${m.status}</span></td>
       <td>
         <div class="flex gap-2">
-          <button class="btn btn-sm btn-secondary" onclick="editMember(${m.id})">✏️</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteMember(${m.id})">🗑️</button>
+          <button class="btn btn-sm btn-secondary" onclick="editMember(${m.id})"></button>
+          <button class="btn btn-sm btn-danger" onclick="deleteMember(${m.id})"></button>
         </div>
       </td>
     </tr>
@@ -539,7 +539,7 @@ async function loadTrainers() {
     const grid = document.getElementById("trainers-grid");
     if (!data.length) {
       grid.innerHTML =
-        '<div class="empty-state"><div class="empty-icon">💪</div>No trainers found</div>';
+        '<div class="empty-state"><div class="empty-icon"></div>No trainers found</div>';
       return;
     }
     grid.innerHTML = data
@@ -616,7 +616,7 @@ async function loadSessions() {
     const tbody = document.getElementById("sessions-tbody");
     if (!data.length) {
       tbody.innerHTML =
-        '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">📅</div>No sessions booked</div></td></tr>';
+        '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon"></div>No sessions booked</div></td></tr>';
       return;
     }
     const statusColors = {
@@ -689,7 +689,7 @@ async function loadAttendance() {
     );
     if (!today.length) {
       tbody.innerHTML =
-        '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">✅</div>No check-ins today</div></td></tr>';
+        '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon"></div>No check-ins today</div></td></tr>';
       return;
     }
     tbody.innerHTML = today
@@ -748,7 +748,7 @@ async function loadPayments() {
     const tbody = document.getElementById("payments-tbody");
     if (!data.length) {
       tbody.innerHTML =
-        '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">💳</div>No payments yet</div></td></tr>';
+        '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon"></div>No payments yet</div></td></tr>';
       return;
     }
     tbody.innerHTML = [...data]
@@ -793,10 +793,17 @@ async function addPayment() {
 // ============================================================
 // PLANS
 // ============================================================
+let allPlans = [];
+
 async function loadPlans() {
   try {
     const { data } = await api("GET", "/plans");
-    const icons = ["🌱", "⭐", "🏆", "💎"];
+    allPlans = data;
+    const isAdmin = currentUser.role === "admin";
+    const isMember = currentUser.role === "member";
+    const addBtn = document.getElementById("add-plan-btn");
+    if (addBtn) addBtn.classList.toggle("hidden", !isAdmin);
+    const icons = ["", "", "", ""];
     const colors = [
       "var(--blue)",
       "var(--accent)",
@@ -811,11 +818,93 @@ async function loadPlans() {
         <div class="font-bold text-lg mb-1">${p.name}</div>
         <div style="font-size:32px;font-weight:800;color:${colors[i % 4]};margin-bottom:4px;">$${p.price}</div>
         <div class="text-sm text-muted mb-4">${p.durationDays} days / ${p.type}</div>
-        <div>${(p.features || []).map((f) => `<div class="flex items-center gap-2 text-sm mb-1"><span style="color:var(--green);">✓</span>${f}</div>`).join("")}</div>
+        <div>${(p.features || []).map((f) => `<div class="flex items-center gap-2 text-sm mb-1"><span style="color:var(--green);"></span>${f}</div>`).join("")}</div>
+        ${
+          isAdmin
+            ? `<div class="flex gap-2 mt-4">
+                <button class="btn btn-secondary btn-sm" onclick="openEditPlan(${p.id})">Edit</button>
+                <button class="btn btn-danger btn-sm" onclick="deletePlan(${p.id})">Delete</button>
+              </div>`
+            : isMember
+              ? `<button class="btn btn-primary mt-4" style="width:100%;" onclick="bookPlan(${p.id})">Book This Plan</button>`
+              : ""
+        }
       </div>
     `,
       )
       .join("");
+  } catch (e) {}
+}
+
+function openAddPlan() {
+  document.getElementById("plan-modal-title").textContent = "Add Plan";
+  document.getElementById("plan-id").value = "";
+  document.getElementById("plan-name").value = "";
+  document.getElementById("plan-type").value = "basic";
+  document.getElementById("plan-price").value = "";
+  document.getElementById("plan-duration").value = "30";
+  document.getElementById("plan-features").value = "";
+  openModal("add-plan");
+}
+
+function openEditPlan(id) {
+  const plan = allPlans.find((p) => p.id === id);
+  if (!plan) return;
+  document.getElementById("plan-modal-title").textContent = "Edit Plan";
+  document.getElementById("plan-id").value = plan.id;
+  document.getElementById("plan-name").value = plan.name;
+  document.getElementById("plan-type").value = plan.type;
+  document.getElementById("plan-price").value = plan.price;
+  document.getElementById("plan-duration").value = plan.durationDays;
+  document.getElementById("plan-features").value = (plan.features || []).join(
+    "\n",
+  );
+  openModal("add-plan");
+}
+
+async function savePlan() {
+  const id = document.getElementById("plan-id").value;
+  const name = document.getElementById("plan-name").value.trim();
+  const type = document.getElementById("plan-type").value;
+  const price = parseFloat(document.getElementById("plan-price").value) || 0;
+  const durationDays =
+    parseInt(document.getElementById("plan-duration").value) || 30;
+  const features = document
+    .getElementById("plan-features")
+    .value.split("\n")
+    .map((f) => f.trim())
+    .filter(Boolean);
+  if (!name) return toast("Plan name required", "warning");
+  try {
+    if (id) {
+      await api("PUT", `/plans/${id}`, { name, type, price, durationDays, features });
+      toast("Plan updated!", "success");
+    } else {
+      await api("POST", "/plans", { name, type, price, durationDays, features });
+      toast("Plan created!", "success");
+    }
+    closeModal();
+    loadPlans();
+  } catch (e) {}
+}
+
+async function deletePlan(id) {
+  if (!confirm("Remove this plan?")) return;
+  try {
+    await api("DELETE", `/plans/${id}`);
+    toast("Plan removed", "success");
+    loadPlans();
+  } catch (e) {}
+}
+
+async function bookPlan(id) {
+  const plan = allPlans.find((p) => p.id === id);
+  if (!plan) return;
+  if (!confirm(`Book the "${plan.name}" plan for $${plan.price}?`)) return;
+  try {
+    await api("POST", "/members/me/plan", { planId: id });
+    toast(`You're now on the ${plan.name} plan!`, "success");
+    navigate("my-membership");
   } catch (e) {}
 }
 
@@ -845,7 +934,7 @@ async function loadEquipment() {
         <td><span class="badge badge-${condColors[e.conditionStatus] || "blue"}">${e.conditionStatus}</span></td>
         <td class="text-sm text-muted">${e.nextMaintenance || "—"}</td>
         <td>
-          <button class="btn btn-sm btn-danger" onclick="deleteEquipment(${e.id})">🗑️</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteEquipment(${e.id})"></button>
         </td>
       </tr>
     `,
@@ -898,14 +987,14 @@ async function loadMyMembership() {
     const card = document.getElementById("my-membership-card");
     if (!mine) {
       card.innerHTML =
-        '<div class="empty-state"><div class="empty-icon">🎫</div>No membership found. Contact admin.</div>';
+        '<div class="empty-state"><div class="empty-icon"></div>No membership found. Contact admin.</div>';
     } else {
       const daysLeft = Math.ceil(
         (new Date(mine.expiryDate) - new Date()) / 86400000,
       );
       const progress = Math.max(0, Math.min(100, (daysLeft / 30) * 100));
       card.innerHTML = `
-        <div class="card-header"><span class="card-title">🎫 ${mine.planName}</span><span class="badge badge-${mine.status === "active" ? "green" : "red"}">${mine.status}</span></div>
+        <div class="card-header"><span class="card-title">${mine.planName}</span><span class="badge badge-${mine.status === "active" ? "green" : "red"}">${mine.status}</span></div>
         <div class="grid grid-cols-2 gap-3 mb-4">
           <div class="trainer-stat" style="padding:12px;"><div class="value" style="font-size:20px;">${mine.joinDate}</div><div class="label">Join Date</div></div>
           <div class="trainer-stat" style="padding:12px;"><div class="value" style="font-size:20px;${daysLeft < 7 ? "color:var(--red)" : ""}">${daysLeft}d</div><div class="label">Days Left</div></div>
@@ -919,6 +1008,7 @@ async function loadMyMembership() {
       `;
     }
     const { data: plans } = await api("GET", "/plans");
+    allPlans = plans;
     document.getElementById("upgrade-plans").innerHTML = plans
       .map(
         (p) => `
@@ -927,7 +1017,10 @@ async function loadMyMembership() {
           <div class="font-medium text-sm">${p.name}</div>
           <div class="text-xs text-muted">${p.durationDays} days</div>
         </div>
-        <span class="font-bold text-accent">$${p.price}</span>
+        <div class="flex items-center gap-3">
+          <span class="font-bold text-accent">$${p.price}</span>
+          <button class="btn btn-primary btn-sm" onclick="bookPlan(${p.id})">${mine && mine.planId === p.id ? "Renew" : "Switch"}</button>
+        </div>
       </div>
     `,
       )
@@ -1109,7 +1202,7 @@ function initTrainer3D() {
       .map(
         ([k, v]) => `
       <div class="exercise-btn ${k === currentExercise ? "active" : ""}" id="ebtn-${k}" onclick="selectExercise('${k}')">
-        <div style="font-size:18px;margin-bottom:4px;">${{ squat: "🏋️", pushup: "💪", curl: "🦾", lunge: "🚶", plank: "🧘", jumpjack: "🤸" }[k]}</div>
+        <div style="font-size:18px;margin-bottom:4px;">${{ squat: "", pushup: "", curl: "", lunge: "", plank: "", jumpjack: "" }[k]}</div>
         <div>${v.name}</div>
       </div>
     `,
@@ -1137,12 +1230,12 @@ function updateMuscleTargets() {
   const el = document.getElementById("muscle-targets");
   if (!el) return;
   const ex = exercises[currentExercise];
-  el.innerHTML = `<div class="text-sm font-medium mb-2">🎯 Target Muscles</div><div>${(ex.muscle || []).map((m) => `<span class="tag">💪 ${m}</span>`).join("")}</div>`;
+  el.innerHTML = `<div class="text-sm font-medium mb-2">Target Muscles</div><div>${(ex.muscle || []).map((m) => `<span class="tag">${m}</span>`).join("")}</div>`;
 }
 
 function speak(text) {
   const el = document.getElementById("trainer-speech");
-  if (el) el.textContent = `🤖 "${text}"`;
+  if (el) el.textContent = `"${text}"`;
 }
 
 function startSession() {

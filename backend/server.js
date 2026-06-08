@@ -384,6 +384,38 @@ app.delete("/api/members/:id", auth, role("admin"), async (req, res) => {
   }
 });
 
+app.post("/api/members/me/plan", auth, role("member"), async (req, res) => {
+  const { planId } = req.body;
+  if (!planId) {
+    return res.status(400).json({ success: false, error: "planId is required" });
+  }
+  try {
+    const member = await db.getMemberByUserId(req.user.id);
+    if (!member) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Membership not found" });
+    }
+    const plan = await db.getPlanById(planId);
+    if (!plan) {
+      return res.status(404).json({ success: false, error: "Plan not found" });
+    }
+    const joinDate = new Date();
+    const expiryDate = new Date(joinDate);
+    expiryDate.setDate(expiryDate.getDate() + (plan.durationDays || 30));
+    const updated = await db.updateMember(member.id, {
+      planName: plan.name,
+      planId: plan.id,
+      joinDate: joinDate.toISOString().slice(0, 10),
+      expiryDate: expiryDate.toISOString().slice(0, 10),
+      status: "active",
+    });
+    res.json({ success: true, message: "Plan booked", data: updated });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 app.get("/api/trainers", auth, async (req, res) => {
   try {
     const data = await db.getTrainers();
@@ -456,6 +488,45 @@ app.get("/api/plans", async (req, res) => {
   try {
     const data = await db.getPlans();
     res.json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post("/api/plans", auth, role("admin"), async (req, res) => {
+  const { name, type, price, durationDays, features } = req.body;
+  if (!name || !type) {
+    return res
+      .status(400)
+      .json({ success: false, error: "Name and type are required" });
+  }
+  try {
+    const plan = await db.createPlan({ name, type, price, durationDays, features });
+    res.status(201).json({ success: true, message: "Plan created", data: plan });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.put("/api/plans/:id", auth, role("admin"), async (req, res) => {
+  try {
+    const plan = await db.updatePlan(req.params.id, req.body);
+    if (!plan) {
+      return res.status(404).json({ success: false, error: "Plan not found" });
+    }
+    res.json({ success: true, message: "Plan updated", data: plan });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.delete("/api/plans/:id", auth, role("admin"), async (req, res) => {
+  try {
+    const deleted = await db.deletePlan(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ success: false, error: "Plan not found" });
+    }
+    res.json({ success: true, message: "Plan removed" });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
